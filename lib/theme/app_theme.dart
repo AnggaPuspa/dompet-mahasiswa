@@ -1,14 +1,15 @@
 import 'package:dompet_mahasiswa/theme/app_colors.dart';
+import 'package:dompet_mahasiswa/theme/app_radius.dart';
+import 'package:dompet_mahasiswa/theme/app_spacing.dart';
+import 'package:dompet_mahasiswa/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Theme terang aplikasi. Warna di sini diambil dari AppColors,
-// supaya AppBar dan latar tidak kembali ke warna bawaan Flutter.
+// Theme terang aplikasi. Warna, huruf, dan jarak diambil dari token,
+// supaya tiap layar tidak mengatur ulang AppBar dan field.
 class AppTheme {
   AppTheme._();
 
-  // Ukuran huruf dan jarak sengaja belum diatur di sini.
-  // Nanti ada di AppTextStyles dan AppSpacing, biar angkanya tidak ditulis dua kali.
   static ThemeData light() {
     final colorScheme = ColorScheme.light(
       primary: AppColors.primary,
@@ -22,37 +23,83 @@ class AppTheme {
       outline: AppColors.outline,
     );
 
+    final baseText = GoogleFonts.lexendDecaTextTheme().apply(
+      bodyColor: AppColors.text,
+      displayColor: AppColors.text,
+    );
+
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
-      textTheme: GoogleFonts.lexendDecaTextTheme().apply(
-        bodyColor: AppColors.text,
-        displayColor: AppColors.text,
+      fontFamily: AppTextStyles.fontFamily,
+      textTheme: baseText.copyWith(
+        displayLarge: AppTextStyles.display,
+        headlineMedium: AppTextStyles.heading24,
+        titleMedium: AppTextStyles.heading19,
+        bodyMedium: AppTextStyles.body,
+        bodyLarge: AppTextStyles.bodyStrong,
+        labelSmall: AppTextStyles.caption,
+        labelMedium: AppTextStyles.captionStrong,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.text,
         elevation: 0,
         centerTitle: true,
+        titleTextStyle: AppTextStyles.heading19,
       ),
-      navigationBarTheme: const NavigationBarThemeData(
+      navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surface,
         indicatorColor: AppColors.primaryTint,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppTextStyles.captionStrong.copyWith(
+              color: AppColors.primary,
+            );
+          }
+          return AppTextStyles.caption;
+        }),
       ),
       cardTheme: const CardThemeData(
         color: AppColors.surface,
         elevation: 0,
         margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.text,
-        contentTextStyle: GoogleFonts.lexendDeca(color: AppColors.onPrimary),
+        contentTextStyle: AppTextStyles.body.copyWith(
+          color: AppColors.onPrimary,
+        ),
         behavior: SnackBarBehavior.floating,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.mdAll),
       ),
       inputDecorationTheme: const InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.s16,
+          vertical: AppSpacing.s12,
+        ),
+        labelStyle: AppTextStyles.caption,
+        hintStyle: AppTextStyles.body,
+        border: OutlineInputBorder(
+          borderRadius: AppRadius.mdAll,
+          borderSide: BorderSide(color: AppColors.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppRadius.mdAll,
+          borderSide: BorderSide(color: AppColors.outline),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppRadius.mdAll,
+          borderSide: BorderSide(color: AppColors.primary),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: AppRadius.mdAll,
+          borderSide: BorderSide(color: AppColors.danger),
+        ),
       ),
     );
   }
