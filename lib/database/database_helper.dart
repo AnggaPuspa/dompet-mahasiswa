@@ -1,5 +1,6 @@
 import 'package:dompet_mahasiswa/application/dompet/kelola_dompet.dart';
 import 'package:dompet_mahasiswa/application/kategori/kelola_kategori.dart';
+import 'package:dompet_mahasiswa/application/laporan/kueri_laporan.dart';
 import 'package:dompet_mahasiswa/application/transaksi/kelola_transaksi.dart';
 import 'package:dompet_mahasiswa/domain/entities/dompet.dart';
 import 'package:dompet_mahasiswa/domain/entities/kategori.dart';
@@ -8,6 +9,7 @@ import 'package:dompet_mahasiswa/domain/entities/transaksi_item.dart';
 import 'package:dompet_mahasiswa/infrastructure/persistence/app_database.dart';
 import 'package:dompet_mahasiswa/infrastructure/persistence/sqlite_dompet_repository.dart';
 import 'package:dompet_mahasiswa/infrastructure/persistence/sqlite_kategori_repository.dart';
+import 'package:dompet_mahasiswa/infrastructure/persistence/sqlite_laporan_repository.dart';
 import 'package:dompet_mahasiswa/infrastructure/persistence/sqlite_transaksi_repository.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -23,6 +25,7 @@ class DatabaseHelper {
     _dompet = KelolaDompet(SqliteDompetRepository(database));
     _kategori = KelolaKategori(SqliteKategoriRepository(database));
     _transaksi = KelolaTransaksi(SqliteTransaksiRepository(database));
+    _laporan = KueriLaporan(SqliteLaporanRepository(database));
   }
 
   static DatabaseHelper? _instance;
@@ -55,6 +58,7 @@ class DatabaseHelper {
   late final KelolaDompet _dompet;
   late final KelolaKategori _kategori;
   late final KelolaTransaksi _transaksi;
+  late final KueriLaporan _laporan;
 
   // Menyimpan dompet baru. Mengembalikan id yang diisi database.
   Future<int> insertDompet(Dompet data) => _dompet.tambah(data);
@@ -72,6 +76,13 @@ class DatabaseHelper {
 
   // Satu dompet. Null bila id tidak ditemukan.
   Future<Dompet?> getDompetById(int id) => _dompet.cari(id);
+
+  // Pemasukan dikurangi pengeluaran pada dompet ini, menurut jenis kategori.
+  // 0 bila dompet belum punya transaksi.
+  Future<int> getSaldoDompet(int dompetId) => _laporan.saldoDompet(dompetId);
+
+  // Jumlah saldo semua dompet. 0 bila belum ada transaksi sama sekali.
+  Future<int> getTotalSaldoSemuaDompet() => _laporan.totalSaldoSemuaDompet();
 
   // Menyimpan kategori. Mengembalikan id baru.
   // Jenis selain Pemasukan atau Pengeluaran ditolak sebelum ditulis.
@@ -119,5 +130,22 @@ class DatabaseHelper {
     int? kategoriId,
   }) {
     return _transaksi.daftar(bulan: bulan, kategoriId: kategoriId);
+  }
+
+  // Total rupiah pemasukan pada bulan yyyy-MM. 0 bila tidak ada.
+  Future<int> getTotalPemasukanBulan(String bulan) {
+    return _laporan.totalPemasukanBulan(bulan);
+  }
+
+  // Total rupiah pengeluaran pada bulan yyyy-MM. 0 bila tidak ada.
+  Future<int> getTotalPengeluaranBulan(String bulan) {
+    return _laporan.totalPengeluaranBulan(bulan);
+  }
+
+  // Kategori pengeluaran dengan total terbesar pada bulan itu.
+  // Paling banyak limit item, diurutkan total menurun. List kosong bila tidak ada pengeluaran.
+  Future<List<({int kategoriId, String nama, int total})>>
+  getTopKategoriPengeluaranBulan(String bulan, {int limit = 3}) {
+    return _laporan.topKategoriPengeluaranBulan(bulan, limit: limit);
   }
 }
