@@ -1,3 +1,4 @@
+import 'package:dompet_mahasiswa/theme/app_theme.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:flutter/material.dart';
 
@@ -12,9 +13,12 @@ class DompetMahasiswaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Layar awal saja. Navigasi dan halaman lain menggantikan home ini nanti.
-    return const MaterialApp(
+    return MaterialApp(
       title: AppStrings.appName,
-      home: Scaffold(body: Center(child: Text(AppStrings.placeholderBody))),
+      theme: AppTheme.light(),
+      home: const Scaffold(
+        body: Center(child: Text(AppStrings.placeholderBody)),
+      ),
     );
   }
 }
