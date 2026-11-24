@@ -1,12 +1,15 @@
 import 'package:dompet_mahasiswa/domain/entities/kategori.dart';
 import 'package:dompet_mahasiswa/domain/repositories/kategori_repository.dart';
+import 'package:dompet_mahasiswa/domain/repositories/transaksi_repository.dart';
 import 'package:dompet_mahasiswa/domain/value_objects/jenis_kategori.dart';
 
 class KelolaKategori {
-  // CRUD kategori hanya membaca tabel kategori.
-  KelolaKategori(this.kategori);
+  // Cek "sedang dipakai" tidak ditaruh di repository kategori.
+  // Repository itu hanya membaca tabel kategori; baris pemakaian ada di transaksi.
+  KelolaKategori({required this.kategori, required this.transaksi});
 
   final KategoriRepository kategori;
+  final TransaksiRepository transaksi;
 
   // Menyimpan kategori dan mengembalikan id baru.
   Future<int> tambah(Kategori data) => kategori.tambah(data);
@@ -29,4 +32,7 @@ class KelolaKategori {
     // Layar akan mengira memang belum ada kategori, bukan input yang keliru.
     return kategori.berdasarkanJenis(JenisKategori.parse(jenis));
   }
+
+  // True bila ada transaksi dengan kategori_id ini.
+  Future<bool> dipakaiDiTransaksi(int id) => transaksi.adaUntukKategori(id);
 }
