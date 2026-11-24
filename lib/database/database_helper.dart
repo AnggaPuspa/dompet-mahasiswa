@@ -1,7 +1,10 @@
 import 'package:dompet_mahasiswa/application/dompet/kelola_dompet.dart';
+import 'package:dompet_mahasiswa/application/kategori/kelola_kategori.dart';
 import 'package:dompet_mahasiswa/domain/entities/dompet.dart';
+import 'package:dompet_mahasiswa/domain/entities/kategori.dart';
 import 'package:dompet_mahasiswa/infrastructure/persistence/app_database.dart';
 import 'package:dompet_mahasiswa/infrastructure/persistence/sqlite_dompet_repository.dart';
+import 'package:dompet_mahasiswa/infrastructure/persistence/sqlite_kategori_repository.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -9,11 +12,12 @@ import 'package:path_provider/path_provider.dart';
 // Satu instance sengaja: tiap layar yang membuka berkas sendiri mudah
 // melewatkan foreign key dan mengunci file di Android.
 class DatabaseHelper {
-  // Merakit repository dompet. Berkas sqlite belum dibuka di sini.
+  // Merakit repository dompet dan kategori. Berkas sqlite belum dibuka di sini.
   DatabaseHelper._() {
     final database = AppDatabase(pathResolver: () => pathResolver());
     _database = database;
     _dompet = KelolaDompet(SqliteDompetRepository(database));
+    _kategori = KelolaKategori(SqliteKategoriRepository(database));
   }
 
   static DatabaseHelper? _instance;
@@ -44,6 +48,7 @@ class DatabaseHelper {
 
   late final AppDatabase _database;
   late final KelolaDompet _dompet;
+  late final KelolaKategori _kategori;
 
   // Menyimpan dompet baru. Mengembalikan id yang diisi database.
   Future<int> insertDompet(Dompet data) => _dompet.tambah(data);
@@ -61,4 +66,26 @@ class DatabaseHelper {
 
   // Satu dompet. Null bila id tidak ditemukan.
   Future<Dompet?> getDompetById(int id) => _dompet.cari(id);
+
+  // Menyimpan kategori. Mengembalikan id baru.
+  // Jenis selain Pemasukan atau Pengeluaran ditolak sebelum ditulis.
+  Future<int> insertKategori(Kategori data) => _kategori.tambah(data);
+
+  // Mengganti nama atau jenis kategori. Mengembalikan jumlah baris yang berubah.
+  Future<int> updateKategori(Kategori data) => _kategori.ubah(data);
+
+  // Menghapus satu kategori. Error SQLite bila masih dipakai transaksi.
+  Future<int> deleteKategori(int id) => _kategori.hapus(id);
+
+  // Seluruh kategori, urut id menaik. List kosong bila belum ada data.
+  Future<List<Kategori>> getAllKategori() => _kategori.semua();
+
+  // Satu kategori. Null bila id tidak ditemukan.
+  Future<Kategori?> getKategoriById(int id) => _kategori.cari(id);
+
+  // Kategori dengan jenis yang diminta. List kosong bila tidak ada yang cocok.
+  // Jenis yang tidak dikenal melempar FormatException, bukan list kosong.
+  Future<List<Kategori>> getKategoriByJenis(String jenis) {
+    return _kategori.berdasarkanJenis(jenis);
+  }
 }
