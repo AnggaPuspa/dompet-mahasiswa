@@ -15,16 +15,20 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 // Layar hanya mengenal kelas ini, bukan sqflite.
+// Repository dirakit di satu tempat supaya ganti penyimpanan tidak menyebar ke UI.
 // Satu instance sengaja: tiap layar yang membuka berkas sendiri mudah
 // melewatkan foreign key dan mengunci file di Android.
 class DatabaseHelper {
-  // Merakit repository. Berkas sqlite belum dibuka di sini.
+  // Merakit repository dan use case. Berkas sqlite belum dibuka di sini.
   DatabaseHelper._() {
     final database = AppDatabase(pathResolver: () => pathResolver());
     _database = database;
-    _dompet = KelolaDompet(SqliteDompetRepository(database));
-    _kategori = KelolaKategori(SqliteKategoriRepository(database));
-    _transaksi = KelolaTransaksi(SqliteTransaksiRepository(database));
+    final dompet = SqliteDompetRepository(database);
+    final kategori = SqliteKategoriRepository(database);
+    final transaksi = SqliteTransaksiRepository(database);
+    _dompet = KelolaDompet(dompet: dompet, transaksi: transaksi);
+    _kategori = KelolaKategori(kategori: kategori, transaksi: transaksi);
+    _transaksi = KelolaTransaksi(transaksi);
     _laporan = KueriLaporan(SqliteLaporanRepository(database));
   }
 
@@ -37,6 +41,8 @@ class DatabaseHelper {
   factory DatabaseHelper() => instance;
 
   // Disimpan sebagai fungsi, bukan path yang sudah dihitung.
+  // Path dibaca saat koneksi dibuka, jadi penggantian (misalnya folder tes)
+  // tetap kena pada pembukaan berikutnya, bukan terkunci di konstruktor.
   static Future<String> Function() pathResolver = lokasiBawaan;
 
   // Path berkas di folder dokumen aplikasi, supaya data tetap ada setelah aplikasi ditutup.
@@ -46,6 +52,8 @@ class DatabaseHelper {
   }
 
   // Menutup koneksi dan membuang instance. Isi berkas tidak dihapus.
+  // Instance lama masih memegang koneksi yang sudah ditutup, jadi harus dibuang
+  // sebelum koneksi baru ke berkas yang sama dibuka.
   static Future<void> reset() async {
     final current = _instance;
     _instance = null;
@@ -77,6 +85,11 @@ class DatabaseHelper {
   // Satu dompet. Null bila id tidak ditemukan.
   Future<Dompet?> getDompetById(int id) => _dompet.cari(id);
 
+  // Apakah dompet ini muncul di minimal satu transaksi.
+  // False bila tidak dipakai, termasuk bila id dompet sendiri tidak ada.
+  Future<bool> isDompetUsedInTransaksi(int id) =>
+      _dompet.dipakaiDiTransaksi(id);
+
   // Pemasukan dikurangi pengeluaran pada dompet ini, menurut jenis kategori.
   // 0 bila dompet belum punya transaksi.
   Future<int> getSaldoDompet(int dompetId) => _laporan.saldoDompet(dompetId);
@@ -104,6 +117,12 @@ class DatabaseHelper {
   // Jenis yang tidak dikenal melempar FormatException, bukan list kosong.
   Future<List<Kategori>> getKategoriByJenis(String jenis) {
     return _kategori.berdasarkanJenis(jenis);
+  }
+
+  // Apakah kategori ini muncul di minimal satu transaksi.
+  // False bila tidak dipakai atau id tidak ada.
+  Future<bool> isKategoriUsedInTransaksi(int id) {
+    return _kategori.dipakaiDiTransaksi(id);
   }
 
   // Menyimpan transaksi dan mengembalikan id baru.
