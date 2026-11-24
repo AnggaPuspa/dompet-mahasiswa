@@ -17,4 +17,10 @@ abstract interface class TransaksiRepository {
 
   // Daftar untuk tampilan, sudah digabung dengan nama dompet dan kategori.
   Future<List<TransaksiItem>> daftar(FilterTransaksi filter);
+
+  // True bila ada transaksi pada dompet ini.
+  Future<bool> adaUntukDompet(int dompetId);
+
+  // True bila ada transaksi pada kategori ini.
+  Future<bool> adaUntukKategori(int kategoriId);
 }

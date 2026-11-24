@@ -93,4 +93,26 @@ class SqliteTransaksiRepository implements TransaksiRepository {
       ''', args);
     return [for (final row in rows) TransaksiItem.fromMap(row)];
   }
+
+  // True bila COUNT transaksi untuk dompet ini lebih dari nol.
+  @override
+  Future<bool> adaUntukDompet(int dompetId) {
+    return _ada('dompet_id', dompetId);
+  }
+
+  // True bila COUNT transaksi untuk kategori ini lebih dari nol.
+  @override
+  Future<bool> adaUntukKategori(int kategoriId) {
+    return _ada('kategori_id', kategoriId);
+  }
+
+  // Menghitung baris transaksi pada satu kolom id. False bila hasilnya nol, termasuk id yang tidak ada.
+  Future<bool> _ada(String kolom, int id) async {
+    final db = await _database.database;
+    final rows = await db.rawQuery(
+      'SELECT COUNT(*) AS jumlah FROM $tabelTransaksi WHERE $kolom = ?',
+      [id],
+    );
+    return bacaInt(rows.first['jumlah']) > 0;
+  }
 }
