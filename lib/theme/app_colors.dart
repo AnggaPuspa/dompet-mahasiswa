@@ -42,6 +42,11 @@ class AppColors {
   static const Color danger = Color(0xFFF0566E);
   static const Color dangerTint = Color(0xFFFFE5EA);
 
+  // Bayangan Figma. Hex-nya tetap di file ini, bukan di widget.
+  static const Color shadowCard = Color(0x0A000000);
+  static const Color shadowHero = Color(0x08000000);
+  static const Color shadowPrimary = Color(0x7D5F33E1);
+
   // Bukan warna baru. Layar cukup menulis pemasukan/pengeluaran,
   // tanpa perlu tahu nama success/danger dari Figma.
   static const Color pemasukan = success;
