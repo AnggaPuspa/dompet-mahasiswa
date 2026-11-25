@@ -38,7 +38,12 @@ class _DompetListPageState extends State<DompetListPage> {
     );
   }
 
-  void _segarkan() => setState(() => _daftar = _muatDaftar());
+  void _segarkan() {
+    final daftar = _muatDaftar();
+    setState(() {
+      _daftar = daftar;
+    });
+  }
 
   Future<void> _bukaForm({int? id}) async {
     final disimpan = await Navigator.push<bool>(
