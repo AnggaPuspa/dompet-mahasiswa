@@ -1,3 +1,4 @@
+import 'package:dompet_mahasiswa/pages/dompet_list_page.dart';
 import 'package:dompet_mahasiswa/theme/app_theme.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ class DompetMahasiswaApp extends StatelessWidget {
     return MaterialApp(
       title: AppStrings.appName,
       theme: AppTheme.light(),
+      routes: {DompetListPage.routeName: (context) => const DompetListPage()},
       home: const Scaffold(
         body: Center(child: Text(AppStrings.placeholderBody)),
       ),
