@@ -4,8 +4,11 @@ import 'package:dompet_mahasiswa/theme/app_spacing.dart';
 import 'package:dompet_mahasiswa/theme/app_text_styles.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:dompet_mahasiswa/utils/currency_format.dart';
+import 'package:dompet_mahasiswa/utils/snackbar_helper.dart';
 import 'package:dompet_mahasiswa/widgets/app_button.dart';
 import 'package:dompet_mahasiswa/widgets/app_card.dart';
+import 'package:dompet_mahasiswa/widgets/confirm_dialog.dart';
+import 'package:dompet_mahasiswa/widgets/empty_state.dart';
 import 'package:flutter/material.dart';
 
 typedef _BarisDompet = ({int id, String nama, int saldo});
@@ -19,6 +22,7 @@ class DompetListPage extends StatefulWidget {
 
 class _DompetListPageState extends State<DompetListPage> {
   late Future<List<_BarisDompet>> _daftar = _muatDaftar();
+  bool _menghapus = false;
 
   Future<List<_BarisDompet>> _muatDaftar() async {
     final database = DatabaseHelper.instance;
@@ -42,6 +46,45 @@ class _DompetListPageState extends State<DompetListPage> {
     if (mounted && disimpan == true) _segarkan();
   }
 
+  Future<void> _hapus(_BarisDompet item) async {
+    if (_menghapus) return;
+    setState(() => _menghapus = true);
+
+    try {
+      final konfirmasi = await ConfirmDialog.show(
+        context,
+        title: AppStrings.hapusDompetJudul,
+        message: AppStrings.konfirmasiHapusDompet(item.nama),
+        confirmLabel: AppStrings.hapus,
+        cancelLabel: AppStrings.batal,
+        isDanger: true,
+      );
+      if (!mounted || !konfirmasi) return;
+
+      final database = DatabaseHelper.instance;
+      if (await database.isDompetUsedInTransaksi(item.id)) {
+        if (mounted) {
+          showErrorSnackbar(context, AppStrings.dompetTidakBisaDihapus);
+        }
+        return;
+      }
+      if (!mounted) return;
+
+      final jumlah = await database.deleteDompet(item.id);
+      if (!mounted) return;
+      _segarkan();
+      if (jumlah > 0) {
+        showSuccessSnackbar(context, AppStrings.dompetDihapus);
+      } else {
+        showErrorSnackbar(context, AppStrings.gagalMenghapusDompet);
+      }
+    } catch (_) {
+      if (mounted) showErrorSnackbar(context, AppStrings.gagalMenghapusDompet);
+    } finally {
+      if (mounted) setState(() => _menghapus = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +97,7 @@ class _DompetListPageState extends State<DompetListPage> {
               label: AppStrings.tambah,
               variant: AppButtonVariant.secondary,
               isExpanded: false,
-              onPressed: _bukaForm,
+              onPressed: _menghapus ? null : _bukaForm,
             ),
           ),
         ],
@@ -67,9 +110,21 @@ class _DompetListPageState extends State<DompetListPage> {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
-              return const Center(child: Text(AppStrings.gagalMemuatDompet));
+              return EmptyState(
+                title: AppStrings.gagalMemuatDompet,
+                actionLabel: AppStrings.cobaLagi,
+                onAction: _segarkan,
+              );
             }
             final daftar = snapshot.requireData;
+            if (daftar.isEmpty) {
+              return EmptyState(
+                title: AppStrings.belumAdaDompet,
+                message: AppStrings.belumAdaDompetPesan,
+                actionLabel: AppStrings.tambahDompet,
+                onAction: _bukaForm,
+              );
+            }
             return ListView.separated(
               padding: AppSpacing.pad16,
               itemCount: daftar.length,
@@ -85,7 +140,7 @@ class _DompetListPageState extends State<DompetListPage> {
 
   Widget _kartu(_BarisDompet item) {
     return AppCard(
-      onTap: () => _bukaForm(id: item.id),
+      onTap: _menghapus ? null : () => _bukaForm(id: item.id),
       child: Row(
         children: [
           Expanded(
@@ -101,10 +156,10 @@ class _DompetListPageState extends State<DompetListPage> {
               ],
             ),
           ),
-          const IconButton(
+          IconButton(
             tooltip: AppStrings.hapus,
-            onPressed: null,
-            icon: Icon(Icons.delete_outline),
+            onPressed: _menghapus ? null : () => _hapus(item),
+            icon: const Icon(Icons.delete_outline),
           ),
         ],
       ),
