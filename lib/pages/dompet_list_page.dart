@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 class DompetListPage extends StatelessWidget {
   const DompetListPage({super.key});
 
+  static const routeName = '/dompet';
+
   void _bukaForm(BuildContext context, {int? id}) {
     Navigator.push<bool>(
       context,
