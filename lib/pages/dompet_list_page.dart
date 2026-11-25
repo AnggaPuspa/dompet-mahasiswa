@@ -13,6 +13,8 @@ typedef _BarisDompet = ({int id, String nama, int saldo});
 class DompetListPage extends StatefulWidget {
   const DompetListPage({super.key});
 
+  static const routeName = '/dompet';
+
   @override
   State<DompetListPage> createState() => _DompetListPageState();
 }
