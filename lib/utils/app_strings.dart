@@ -25,6 +25,7 @@ abstract final class AppStrings {
 
   static const String namaDompet = 'Nama Dompet';
   static const String hintNamaDompet = 'Contoh: Dompet Utama';
+  static const String contohDaftarDompet = 'Dompet Utama';
   static const String namaKategori = 'Nama Kategori';
   static const String hintNamaKategori = 'Contoh: Makanan';
   static const String jenis = 'Jenis';
