@@ -1,0 +1,487 @@
+import 'package:dompet_mahasiswa/database/database_helper.dart';
+import 'package:dompet_mahasiswa/domain/entities/kategori.dart';
+import 'package:dompet_mahasiswa/domain/value_objects/jenis_kategori.dart';
+import 'package:dompet_mahasiswa/pages/kategori_form_page.dart';
+import 'package:dompet_mahasiswa/theme/app_colors.dart';
+import 'package:dompet_mahasiswa/theme/app_radius.dart';
+import 'package:dompet_mahasiswa/theme/app_spacing.dart';
+import 'package:dompet_mahasiswa/theme/app_text_styles.dart';
+import 'package:dompet_mahasiswa/theme/app_theme.dart';
+import 'package:dompet_mahasiswa/utils/app_strings.dart';
+import 'package:dompet_mahasiswa/utils/color_helper.dart';
+import 'package:dompet_mahasiswa/utils/snackbar_helper.dart';
+import 'package:dompet_mahasiswa/widgets/app_button.dart';
+import 'package:dompet_mahasiswa/widgets/app_card.dart';
+import 'package:dompet_mahasiswa/widgets/confirm_dialog.dart';
+import 'package:dompet_mahasiswa/widgets/empty_state.dart';
+import 'package:flutter/material.dart';
+
+class KategoriListPage extends StatefulWidget {
+  const KategoriListPage({super.key});
+
+  @override
+  State<KategoriListPage> createState() => _KategoriListPageState();
+}
+
+class _KategoriListPageState extends State<KategoriListPage> {
+  final _database = DatabaseHelper.instance;
+  List<Kategori> _categories = [];
+  JenisKategori? _filter;
+  bool _loading = true;
+  bool _loadFailed = false;
+  bool _deleting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _loadFailed = false;
+    });
+    try {
+      final categories = await _database.getAllKategori();
+      if (!mounted) return;
+      setState(() => _categories = categories);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loadFailed = true);
+      showErrorSnackbar(context, AppStrings.gagalMemuatKategori);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _openForm([Kategori? category]) async {
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => KategoriFormPage(category: category)),
+    );
+    if (mounted && saved == true) {
+      _filter = null;
+      await _load();
+    }
+  }
+
+  Future<void> _delete(Kategori category) async {
+    final id = category.id;
+    if (id == null || _deleting) return;
+    setState(() => _deleting = true);
+    try {
+      final confirmed = await ConfirmDialog.show(
+        context,
+        title: AppStrings.hapusKategoriJudul,
+        message: AppStrings.konfirmasiHapusKategori(category.nama),
+        icon: const _DialogIcon('confirm', AppColors.dangerTint),
+      );
+      if (!mounted || !confirmed) return;
+      if (await _database.isKategoriUsedInTransaksi(id)) {
+        if (mounted) await _showBlockedDeletion();
+        return;
+      }
+      try {
+        await _database.deleteKategori(id);
+      } catch (_) {
+        // A transaction can start using the category after the first check.
+        if (!await _database.isKategoriUsedInTransaksi(id)) rethrow;
+        if (mounted) await _showBlockedDeletion();
+        return;
+      }
+      if (!mounted) return;
+      await _load();
+      if (mounted && !_loadFailed) {
+        showSuccessSnackbar(context, AppStrings.kategoriDihapus);
+      }
+    } catch (_) {
+      if (mounted) {
+        showErrorSnackbar(context, AppStrings.gagalMenghapusKategori);
+      }
+    } finally {
+      if (mounted) setState(() => _deleting = false);
+    }
+  }
+
+  Future<void> _showBlockedDeletion() async {
+    await ConfirmDialog.show(
+      context,
+      title: AppStrings.kategoriTidakBisaDihapusJudul,
+      message: AppStrings.kategoriTidakBisaDihapus,
+      confirmLabel: AppStrings.mengerti,
+      cancelLabel: null,
+      isDanger: false,
+      icon: const _DialogIcon('alert', AppColors.tintOrange),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final showEmpty = !_loading && !_loadFailed && _categories.isEmpty;
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        toolbarHeight: AppTheme.tabToolbarHeight,
+        title: const Text(AppStrings.kategori, style: AppTextStyles.h2),
+        centerTitle: true,
+        backgroundColor: AppColors.background.withValues(alpha: 0),
+        actions: [
+          IconButton(
+            tooltip: AppStrings.tambah,
+            onPressed: _deleting ? null : _openForm,
+            icon: const _AddIcon(),
+          ),
+        ],
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset('assets/kategori/background.png', fit: BoxFit.cover),
+          SafeArea(
+            top: !showEmpty,
+            minimum: EdgeInsets.only(bottom: showEmpty ? AppSpacing.s32 : 0),
+            child: _buildContent(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    if (_loading) return const Center(child: CircularProgressIndicator());
+    if (_loadFailed) {
+      return EmptyState(
+        title: AppStrings.gagalMemuatKategori,
+        actionLabel: AppStrings.cobaLagi,
+        onAction: () {
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+          _load();
+        },
+      );
+    }
+    if (_categories.isEmpty) {
+      return EmptyState(
+        title: AppStrings.belumAdaKategori,
+        message: AppStrings.pesanKategoriKosong,
+        icon: const _EmptyIllustration(),
+        actionLabel: AppStrings.tambahKategori,
+        onAction: _openForm,
+      );
+    }
+
+    final filter = _filter;
+    final visible = filter == null
+        ? _categories
+        : _categories
+              .where((category) => category.jenis == filter.value)
+              .toList();
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.s22,
+        0,
+        AppSpacing.s22,
+        AppSpacing.s24,
+      ),
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _filterChip(AppStrings.semua, null),
+              const SizedBox(width: AppSpacing.s12),
+              _filterChip(AppStrings.pemasukan, JenisKategori.pemasukan),
+              const SizedBox(width: AppSpacing.s12),
+              _filterChip(AppStrings.pengeluaran, JenisKategori.pengeluaran),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.s20),
+        Row(
+          children: [
+            Text(_label(filter), style: AppTextStyles.h2),
+            const SizedBox(width: AppSpacing.s8),
+            _Badge(
+              label: '${visible.length}',
+              color: AppColors.primary,
+              background: AppColors.tintLilac,
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.s16),
+        if (visible.isEmpty)
+          const Padding(
+            padding: EdgeInsets.only(bottom: AppSpacing.s16),
+            child: Text(
+              AppStrings.kategoriFilterKosong,
+              style: AppTextStyles.body,
+            ),
+          ),
+        for (final category in visible)
+          AppCard(
+            key: ValueKey(category.id),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.s16,
+              vertical: AppSpacing.s10,
+            ),
+            margin: const EdgeInsets.only(bottom: AppSpacing.s16),
+            onTap: _deleting ? null : () => _openForm(category),
+            child: _CategoryRow(
+              category: category,
+              onEdit: _deleting ? null : () => _openForm(category),
+              onDelete: _deleting ? null : () => _delete(category),
+            ),
+          ),
+        AppButton(
+          label: AppStrings.tambahKategori,
+          icon: const _AddIcon(),
+          variant: AppButtonVariant.tinted,
+          onPressed: _deleting ? null : _openForm,
+        ),
+      ],
+    );
+  }
+
+  Widget _filterChip(String label, JenisKategori? type) {
+    final selected = _filter == type;
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      showCheckmark: false,
+      side: BorderSide.none,
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.pillAll),
+      backgroundColor: AppColors.tintLilac,
+      selectedColor: AppColors.primary,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
+      labelStyle: (selected ? AppTextStyles.bodyStrong : AppTextStyles.body)
+          .copyWith(color: selected ? AppColors.onPrimary : AppColors.primary),
+      onSelected: (_) => setState(() => _filter = type),
+    );
+  }
+
+  String _label(JenisKategori? type) => switch (type) {
+    null => AppStrings.semuaKategori,
+    JenisKategori.pemasukan => AppStrings.pemasukan,
+    JenisKategori.pengeluaran => AppStrings.pengeluaran,
+  };
+}
+
+class _AddIcon extends StatelessWidget {
+  const _AddIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      'assets/kategori/add.png',
+      width: AppSpacing.s24,
+      height: AppSpacing.s24,
+      color: IconTheme.of(context).color,
+    );
+  }
+}
+
+class _CategoryRow extends StatelessWidget {
+  const _CategoryRow({
+    required this.category,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final Kategori category;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final income = category.jenis == JenisKategori.pemasukan.value;
+    final foreground = colorForJenis(category.jenis);
+    return Row(
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: income ? AppColors.successTint : AppColors.tintSky,
+            borderRadius: AppRadius.tileAll,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.s6),
+            child: Image.asset(
+              income ? 'assets/kategori/income.png' : 'assets/kategori/tag.png',
+              width: AppSpacing.s20,
+              height: AppSpacing.s20,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.s12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(category.nama, style: AppTextStyles.body),
+              const SizedBox(height: AppSpacing.s4),
+              _Badge(
+                label: income ? AppStrings.pemasukan : AppStrings.pengeluaran,
+                color: income ? AppColors.successStrong : foreground,
+                background: income
+                    ? AppColors.successTint
+                    : AppColors.dangerTint,
+              ),
+            ],
+          ),
+        ),
+        _CategoryAction(
+          label: AppStrings.ubahKategori,
+          asset: 'edit',
+          background: AppColors.tintLilac,
+          onPressed: onEdit,
+        ),
+        _CategoryAction(
+          label: AppStrings.hapus,
+          asset: 'delete',
+          background: AppColors.dangerTint,
+          onPressed: onDelete,
+        ),
+      ],
+    );
+  }
+}
+
+class _CategoryAction extends StatelessWidget {
+  const _CategoryAction({
+    required this.label,
+    required this.asset,
+    required this.background,
+    required this.onPressed,
+  });
+
+  final String label;
+  final String asset;
+  final Color background;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: label,
+      onPressed: onPressed,
+      icon: Container(
+        width: AppSpacing.s24,
+        height: AppSpacing.s24,
+        decoration: BoxDecoration(
+          color: background,
+          borderRadius: AppRadius.smAll,
+        ),
+        alignment: Alignment.center,
+        child: Image.asset(
+          'assets/kategori/$asset.png',
+          width: AppSpacing.s14,
+          height: AppSpacing.s14,
+        ),
+      ),
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  const _Badge({
+    required this.label,
+    required this.color,
+    required this.background,
+  });
+
+  final String label;
+  final Color color;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: AppRadius.fullAll,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.s6,
+          vertical: AppSpacing.s2,
+        ),
+        child: Text(label, style: AppTextStyles.label.copyWith(color: color)),
+      ),
+    );
+  }
+}
+
+class _DialogIcon extends StatelessWidget {
+  const _DialogIcon(this.asset, this.background);
+
+  final String asset;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      radius: AppSpacing.s28,
+      backgroundColor: background,
+      child: Image.asset(
+        'assets/kategori/$asset.png',
+        width: AppSpacing.s24,
+        height: AppSpacing.s24,
+      ),
+    );
+  }
+}
+
+class _EmptyIllustration extends StatefulWidget {
+  const _EmptyIllustration();
+
+  @override
+  State<_EmptyIllustration> createState() => _EmptyIllustrationState();
+}
+
+class _EmptyIllustrationState extends State<_EmptyIllustration>
+    with SingleTickerProviderStateMixin {
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 2),
+  );
+  late final _offset = TweenSequence<double>([
+    TweenSequenceItem(
+      tween: Tween(
+        begin: 0.0,
+        end: -AppSpacing.s10,
+      ).chain(CurveTween(curve: Curves.easeInOut)),
+      weight: 60,
+    ),
+    TweenSequenceItem(
+      tween: Tween(
+        begin: -AppSpacing.s10,
+        end: 0.0,
+      ).chain(CurveTween(curve: Curves.easeInOut)),
+      weight: 40,
+    ),
+  ]).animate(_controller);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.reset();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _offset,
+      child: Image.asset('assets/kategori/empty.png', width: 220, height: 176),
+      builder: (_, child) =>
+          Transform.translate(offset: Offset(0, _offset.value), child: child),
+    );
+  }
+}

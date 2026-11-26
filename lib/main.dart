@@ -1,3 +1,4 @@
+import 'package:dompet_mahasiswa/pages/kategori_list_page.dart';
 import 'package:dompet_mahasiswa/theme/app_theme.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -12,13 +13,12 @@ class DompetMahasiswaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Layar awal saja. Navigasi dan halaman lain menggantikan home ini nanti.
+    // MainShell akan memasang halaman ini sebagai tab Kategori.
     return MaterialApp(
       title: AppStrings.appName,
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      home: const Scaffold(
-        body: Center(child: Text(AppStrings.placeholderBody)),
-      ),
+      home: const KategoriListPage(),
     );
   }
 }

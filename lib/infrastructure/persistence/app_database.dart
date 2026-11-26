@@ -14,7 +14,14 @@ class AppDatabase {
 
   // Koneksi yang sudah dibuka, atau membuka berkas bila ini pemanggilan pertama.
   Future<Database> get database async {
-    final db = await (_opening ??= _open());
+    final opening = _opening ??= _open();
+    final Database db;
+    try {
+      db = await opening;
+    } catch (_) {
+      if (identical(_opening, opening)) _opening = null;
+      rethrow;
+    }
     // Pragma ini per koneksi dan default-nya mati.
     // Diulang di sini, bukan hanya saat create: hot restart bisa memakai
     // koneksi baru yang belum pernah melewati onConfigure.

@@ -3,12 +3,13 @@ import 'package:dompet_mahasiswa/theme/app_radius.dart';
 import 'package:dompet_mahasiswa/theme/app_spacing.dart';
 import 'package:dompet_mahasiswa/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 // Theme terang aplikasi. Warna, huruf, dan jarak diambil dari token,
 // supaya tiap layar tidak mengatur ulang AppBar dan field.
 class AppTheme {
   AppTheme._();
+
+  static const double tabToolbarHeight = 72;
 
   static ThemeData light() {
     final colorScheme = ColorScheme.light(
@@ -23,17 +24,12 @@ class AppTheme {
       outline: AppColors.outline,
     );
 
-    final baseText = GoogleFonts.lexendDecaTextTheme().apply(
-      bodyColor: AppColors.text,
-      displayColor: AppColors.text,
-    );
-
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
       fontFamily: AppTextStyles.fontFamily,
-      textTheme: baseText.copyWith(
+      textTheme: const TextTheme(
         displayLarge: AppTextStyles.display,
         headlineMedium: AppTextStyles.heading24,
         titleMedium: AppTextStyles.heading19,
