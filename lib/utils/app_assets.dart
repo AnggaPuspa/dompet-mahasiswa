@@ -3,6 +3,4 @@ abstract final class AppAssets {
   static const kategoriBackground = '$_kategori/background.png';
   static const kategoriIncome = '$_kategori/income.png';
   static const kategoriTag = '$_kategori/tag.png';
-  static const kategoriEdit = '$_kategori/edit.png';
-  static const kategoriDelete = '$_kategori/delete.png';
 }

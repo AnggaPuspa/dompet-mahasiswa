@@ -3,17 +3,20 @@ import 'package:dompet_mahasiswa/domain/entities/kategori.dart';
 import 'package:dompet_mahasiswa/domain/value_objects/jenis_kategori.dart';
 import 'package:dompet_mahasiswa/pages/kategori_form_page.dart';
 import 'package:dompet_mahasiswa/theme/app_colors.dart';
-import 'package:dompet_mahasiswa/theme/app_radius.dart';
 import 'package:dompet_mahasiswa/theme/app_spacing.dart';
 import 'package:dompet_mahasiswa/theme/app_text_styles.dart';
 import 'package:dompet_mahasiswa/utils/app_assets.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
-import 'package:dompet_mahasiswa/utils/color_helper.dart';
 import 'package:dompet_mahasiswa/utils/snackbar_helper.dart';
+import 'package:dompet_mahasiswa/widgets/app_badge.dart';
 import 'package:dompet_mahasiswa/widgets/app_button.dart';
 import 'package:dompet_mahasiswa/widgets/app_card.dart';
+import 'package:dompet_mahasiswa/widgets/app_filter_chip.dart';
 import 'package:dompet_mahasiswa/widgets/confirm_dialog.dart';
 import 'package:dompet_mahasiswa/widgets/empty_state.dart';
+import 'package:dompet_mahasiswa/widgets/icon_tile.dart';
+// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 class KategoriListPage extends StatefulWidget {
@@ -57,7 +60,7 @@ class _KategoriListPageState extends State<KategoriListPage> {
 
   Future<void> _openForm([Kategori? category]) async {
     final saved = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (_) => KategoriFormPage(category: category)),
+      MaterialPageRoute(builder: (_) => KategoriFormPage(id: category?.id)),
     );
     if (mounted && saved == true) {
       _filter = null;
@@ -81,7 +84,7 @@ class _KategoriListPageState extends State<KategoriListPage> {
       if (!mounted || !confirmed) return;
       if (await _database.isKategoriUsedInTransaksi(id)) {
         if (mounted) {
-          showInfoSnackbar(context, AppStrings.kategoriTidakBisaDihapus);
+          showErrorSnackbar(context, AppStrings.kategoriTidakBisaDihapus);
         }
         return;
       }
@@ -91,7 +94,7 @@ class _KategoriListPageState extends State<KategoriListPage> {
         // A transaction can start using the category after the first check.
         if (!await _database.isKategoriUsedInTransaksi(id)) rethrow;
         if (mounted) {
-          showInfoSnackbar(context, AppStrings.kategoriTidakBisaDihapus);
+          showErrorSnackbar(context, AppStrings.kategoriTidakBisaDihapus);
         }
         return;
       }
@@ -177,26 +180,31 @@ class _KategoriListPageState extends State<KategoriListPage> {
         bottom: AppSpacing.s24,
       ),
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _filterChip(AppStrings.semua, null),
-              const SizedBox(width: AppSpacing.s12),
-              _filterChip(AppStrings.pemasukan, JenisKategori.pemasukan),
-              const SizedBox(width: AppSpacing.s12),
-              _filterChip(AppStrings.pengeluaran, JenisKategori.pengeluaran),
-            ],
-          ),
+        AppFilterChipBar<JenisKategori?>(
+          selected: filter,
+          onSelected: _deleting
+              ? null
+              : (value) => setState(() => _filter = value),
+          options: const [
+            AppFilterOption(value: null, label: AppStrings.semua),
+            AppFilterOption(
+              value: JenisKategori.pemasukan,
+              label: AppStrings.pemasukan,
+            ),
+            AppFilterOption(
+              value: JenisKategori.pengeluaran,
+              label: AppStrings.pengeluaran,
+            ),
+          ],
         ),
         const SizedBox(height: AppSpacing.s20),
         Row(
           children: [
             Text(_label(filter), style: AppTextStyles.h2),
             const SizedBox(width: AppSpacing.s8),
-            _Badge(
+            AppBadge(
               label: '${visible.length}',
-              color: AppColors.primary,
+              foreground: AppColors.primary,
               background: AppColors.tintLilac,
             ),
           ],
@@ -235,23 +243,6 @@ class _KategoriListPageState extends State<KategoriListPage> {
     );
   }
 
-  Widget _filterChip(String label, JenisKategori? type) {
-    final selected = _filter == type;
-    return ChoiceChip(
-      label: Text(label),
-      selected: selected,
-      showCheckmark: false,
-      side: BorderSide.none,
-      shape: const RoundedRectangleBorder(borderRadius: AppRadius.pillAll),
-      backgroundColor: AppColors.tintLilac,
-      selectedColor: AppColors.primary,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s16),
-      labelStyle: (selected ? AppTextStyles.bodyStrong : AppTextStyles.body)
-          .copyWith(color: selected ? AppColors.onPrimary : AppColors.primary),
-      onSelected: (_) => setState(() => _filter = type),
-    );
-  }
-
   String _label(JenisKategori? type) => switch (type) {
     null => AppStrings.semuaKategori,
     JenisKategori.pemasukan => AppStrings.pemasukan,
@@ -273,22 +264,16 @@ class _CategoryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final income = category.jenis == JenisKategori.pemasukan.value;
-    final foreground = colorForJenis(category.jenis);
     return Row(
       children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: income ? AppColors.successTint : AppColors.tintSky,
-            borderRadius: AppRadius.tileAll,
+        IconTile(
+          icon: Image.asset(
+            income ? AppAssets.kategoriIncome : AppAssets.kategoriTag,
+            width: IconTile.glyphExtent,
+            height: IconTile.glyphExtent,
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.s6),
-            child: Image.asset(
-              income ? AppAssets.kategoriIncome : AppAssets.kategoriTag,
-              width: AppSpacing.s20,
-              height: AppSpacing.s20,
-            ),
-          ),
+          background: income ? AppColors.successTint : AppColors.tintSky,
+          foreground: income ? AppColors.success : AppColors.accentBlue,
         ),
         const SizedBox(width: AppSpacing.s12),
         Expanded(
@@ -297,94 +282,16 @@ class _CategoryRow extends StatelessWidget {
             children: [
               Text(category.nama, style: AppTextStyles.body),
               const SizedBox(height: AppSpacing.s4),
-              _Badge(
+              AppBadge(
                 label: income ? AppStrings.pemasukan : AppStrings.pengeluaran,
-                color: income ? AppColors.successStrong : foreground,
-                background: income
-                    ? AppColors.successTint
-                    : AppColors.dangerTint,
+                jenis: category.jenis,
               ),
             ],
           ),
         ),
-        _CategoryAction(
-          label: AppStrings.ubahKategori,
-          asset: AppAssets.kategoriEdit,
-          background: AppColors.tintLilac,
-          onPressed: onEdit,
-        ),
-        _CategoryAction(
-          label: AppStrings.hapus,
-          asset: AppAssets.kategoriDelete,
-          background: AppColors.dangerTint,
-          onPressed: onDelete,
-        ),
+        AppIconButton(variant: IconTileVariant.edit, onPressed: onEdit),
+        AppIconButton(variant: IconTileVariant.delete, onPressed: onDelete),
       ],
-    );
-  }
-}
-
-class _CategoryAction extends StatelessWidget {
-  const _CategoryAction({
-    required this.label,
-    required this.asset,
-    required this.background,
-    required this.onPressed,
-  });
-
-  final String label;
-  final String asset;
-  final Color background;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      tooltip: label,
-      onPressed: onPressed,
-      icon: Container(
-        width: AppSpacing.s24,
-        height: AppSpacing.s24,
-        decoration: BoxDecoration(
-          color: background,
-          borderRadius: AppRadius.smAll,
-        ),
-        alignment: Alignment.center,
-        child: Image.asset(
-          asset,
-          width: AppSpacing.s14,
-          height: AppSpacing.s14,
-        ),
-      ),
-    );
-  }
-}
-
-class _Badge extends StatelessWidget {
-  const _Badge({
-    required this.label,
-    required this.color,
-    required this.background,
-  });
-
-  final String label;
-  final Color color;
-  final Color background;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: AppRadius.fullAll,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.s6,
-          vertical: AppSpacing.s2,
-        ),
-        child: Text(label, style: AppTextStyles.label.copyWith(color: color)),
-      ),
     );
   }
 }

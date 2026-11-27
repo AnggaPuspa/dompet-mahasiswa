@@ -3,14 +3,25 @@ import 'dart:io';
 import 'package:dompet_mahasiswa/database/database_helper.dart';
 import 'package:dompet_mahasiswa/domain/entities/dompet.dart';
 import 'package:dompet_mahasiswa/domain/entities/transaksi.dart';
+import 'package:dompet_mahasiswa/domain/value_objects/jenis_kategori.dart';
+import 'package:dompet_mahasiswa/main.dart';
 import 'package:dompet_mahasiswa/pages/kategori_list_page.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
+import 'package:dompet_mahasiswa/widgets/app_dropdown_form_field.dart';
+// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
+  testWidgets('aplikasi terbuka tanpa crash', (tester) async {
+    await tester.pumpWidget(const DompetMahasiswaApp());
+
+    expect(find.text(AppStrings.placeholderBody), findsOneWidget);
+  });
+
   testWidgets('kategori bisa dibuat, diubah, dan dihapus bila belum dipakai', (
     tester,
   ) async {
@@ -67,18 +78,33 @@ void main() {
 
     await tester.tap(find.text(AppStrings.tambahKategori));
     await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.simpan));
+    await tester.pump();
+    expect(find.text(AppStrings.namaKategoriWajib), findsOneWidget);
+    expect(find.text(AppStrings.jenisWajib), findsOneWidget);
+
     await tester.enterText(find.byType(TextFormField), 'Makan');
+    await tester.tap(find.byType(AppDropdownFormField<JenisKategori>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.pengeluaran).last);
+    await tester.pumpAndSettle();
     await tester.runAsync(() async {
       await tester.tap(find.text(AppStrings.simpan));
     });
+    await waitFor(find.text(AppStrings.kategoriDisimpan));
     await waitFor(find.text('Makan'));
 
-    await tester.tap(find.byTooltip(AppStrings.ubahKategori));
-    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(AppStrings.ubah));
+    await waitFor(find.byType(TextFormField));
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller?.text,
+      'Makan',
+    );
     await tester.enterText(find.byType(TextFormField), 'Makanan');
     await tester.runAsync(() async {
       await tester.tap(find.text(AppStrings.simpan));
     });
+    await waitFor(find.text(AppStrings.kategoriDiperbarui));
     await waitFor(find.text('Makanan'));
 
     await tester.tap(find.byTooltip(AppStrings.hapus));
