@@ -132,6 +132,8 @@ void main() {
       await tester.tap(find.text(AppStrings.hapus));
     });
     await waitFor(find.text(AppStrings.kategoriTidakBisaDihapus));
+    await tester.tap(find.text(AppStrings.mengerti));
+    await tester.pumpAndSettle();
     await tester.runAsync(() async {
       await DatabaseHelper.instance.deleteTransaksi(transactionId!);
     });
