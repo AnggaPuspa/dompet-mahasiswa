@@ -1,5 +1,8 @@
+import 'package:dompet_mahasiswa/pages/main_shell.dart';
 import 'package:dompet_mahasiswa/theme/app_theme.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
+// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,13 +15,12 @@ class DompetMahasiswaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Layar awal saja. Navigasi dan halaman lain menggantikan home ini nanti.
+    // Shell adalah layar awal. Form dibuka sebagai rute di atasnya.
     return MaterialApp(
       title: AppStrings.appName,
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      home: const Scaffold(
-        body: Center(child: Text(AppStrings.placeholderBody)),
-      ),
+      home: const MainShell(),
     );
   }
 }
