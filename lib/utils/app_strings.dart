@@ -81,6 +81,16 @@ abstract final class AppStrings {
   static const String belumAdaData = 'Belum ada data';
   static const String belumAdaDompet = 'Belum ada dompet';
   static const String belumAdaKategori = 'Belum ada kategori';
+  static const String pesanKategoriKosong =
+      'Tambah kategori pemasukan atau pengeluaran untuk mulai mencatat transaksi.';
+  static const String kategoriFilterKosong =
+      'Belum ada kategori untuk jenis ini';
+  static const String gagalMenghapusKategori = 'Gagal menghapus kategori.';
+  static const String gagalMenyimpanKategori = 'Gagal menyimpan kategori.';
+  static const String kategoriTidakDitemukan = 'Kategori tidak ditemukan.';
+  static String konfirmasiHapusKategori(String nama) =>
+      'Kategori "$nama" akan dihapus. Lanjutkan?';
+
   static const String belumAdaTransaksi = 'Belum ada transaksi';
   static const String tidakAdaTransaksiFilter =
       'Tidak ada transaksi untuk filter ini';
