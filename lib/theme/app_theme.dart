@@ -9,6 +9,12 @@ import 'package:flutter/material.dart';
 class AppTheme {
   AppTheme._();
 
+  static const confirmDialogConstraints = BoxConstraints(
+    minWidth: 311,
+    maxWidth: 311,
+    minHeight: 246,
+  );
+
   static ThemeData light() {
     final colorScheme = ColorScheme.light(
       primary: AppColors.primary,
