@@ -16,6 +16,7 @@ class AppColors {
   static const Color textMuted = Color(0xFF6E6A7C);
   static const Color textBlack = Color(0xFF000000);
 
+  static const Color transparent = Colors.transparent;
   static const Color background = Color(0xFFFFFFFF);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color outline = Color(0xFFEFF0F7);
