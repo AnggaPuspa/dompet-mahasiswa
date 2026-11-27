@@ -15,11 +15,49 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+import 'support/sqlite_setup.dart';
+
 void main() {
   testWidgets('aplikasi terbuka tanpa crash', (tester) async {
-    await tester.pumpWidget(const DompetMahasiswaApp());
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfiNoIsolate;
+    silenceDatabaseLockWarning();
+    final directory = Directory.systemTemp.createTempSync('app_shell_');
+    DatabaseHelper.pathResolver = () async {
+      return path.join(directory.path, 'test.db');
+    };
+    addTearDown(() async {
+      await DatabaseHelper.reset();
+      DatabaseHelper.pathResolver = DatabaseHelper.lokasiBawaan;
+      if (directory.existsSync()) {
+        directory.deleteSync(recursive: true);
+      }
+    });
+    final dispatcher = tester.binding.platformDispatcher;
+    dispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(
+      disableAnimations: true,
+    );
+    addTearDown(dispatcher.clearAccessibilityFeaturesTestValue);
 
-    expect(find.text(AppStrings.placeholderBody), findsOneWidget);
+    await tester.runAsync(() => tester.pumpWidget(const DompetMahasiswaApp()));
+
+    expect(find.byTooltip(AppStrings.dashboard), findsOneWidget);
+    expect(find.byTooltip(AppStrings.riwayat), findsOneWidget);
+    expect(find.byTooltip(AppStrings.transaksi), findsOneWidget);
+    expect(find.byTooltip(AppStrings.dompet), findsOneWidget);
+    expect(find.byTooltip(AppStrings.kategori), findsOneWidget);
+
+    for (var attempt = 0; attempt < 100; attempt++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 10)),
+      );
+      await tester.pump(const Duration(milliseconds: 30));
+      if (find.text(AppStrings.belumAdaData).evaluate().isNotEmpty) {
+        await tester.pump(const Duration(milliseconds: 300));
+        break;
+      }
+    }
+    expect(find.text(AppStrings.belumAdaData), findsOneWidget);
   });
 
   testWidgets('kategori bisa dibuat, diubah, dan dihapus bila belum dipakai', (
@@ -27,6 +65,7 @@ void main() {
   ) async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfiNoIsolate;
+    silenceDatabaseLockWarning();
     final directory = Directory.systemTemp.createTempSync('kategori_test_');
     var failFirstLoad = true;
     DatabaseHelper.pathResolver = () async {

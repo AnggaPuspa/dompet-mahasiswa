@@ -121,6 +121,29 @@ abstract final class AppStrings {
   static const String pengeluaranBulanIni = 'Pengeluaran Bulan Ini';
   static const String pengeluaranTerbesarBulanIni = 'Pengeluaran Terbesar';
 
+  // Header dashboard mengikuti frame Figma. Belum ada akun di database,
+  // jadi sapaan ini tetap, bukan nama yang dibaca dari transaksi.
+  static const String sapaan = 'Hello!';
+  static const String namaTampilan = 'Angga Puspa';
+  static const String inisialTampilan = 'AP';
+  static const String budgetTerpakai = 'Budget terpakai';
+  static const String dompetSaya = 'Dompet Saya';
+  static const String total = 'Total';
+  static const String bulanIni = 'bulan ini';
+  static const String halamanBelumSiap = 'Halaman ini belum tersedia.';
+  static const String pesanDashboardKosong =
+      'Tambah dompet dan transaksi untuk melihat ringkasan bulan ini.';
+
+  static String budgetTerpakaiBulan(String bulan) => '$budgetTerpakai · $bulan';
+
+  static String labelNominal(String label, String nominal) => '$label $nominal';
+
+  static String totalNominal(String nominal) => '$total $nominal';
+
+  static String nominalBulanIni(String nominal) => '$nominal · $bulanIni';
+
+  static String jumlahTransaksiDompet(int jumlah) => '$jumlah transaksi';
+
   static const String periodeBulanan = 'Bulanan';
   static const String periodeMingguan = 'Mingguan';
   static const String periodeTahunan = 'Tahunan';
