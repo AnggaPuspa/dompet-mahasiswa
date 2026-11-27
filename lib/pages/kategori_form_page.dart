@@ -1,10 +1,12 @@
 import 'package:dompet_mahasiswa/database/database_helper.dart';
 import 'package:dompet_mahasiswa/domain/entities/kategori.dart';
 import 'package:dompet_mahasiswa/domain/value_objects/jenis_kategori.dart';
+import 'package:dompet_mahasiswa/domain/value_objects/nama_kategori.dart';
 import 'package:dompet_mahasiswa/theme/app_spacing.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:dompet_mahasiswa/utils/snackbar_helper.dart';
 import 'package:dompet_mahasiswa/widgets/app_button.dart';
+import 'package:dompet_mahasiswa/widgets/app_dropdown_form_field.dart';
 import 'package:dompet_mahasiswa/widgets/app_text_field.dart';
 import 'package:flutter/material.dart';
 
@@ -55,11 +57,12 @@ class _KategoriFormPageState extends State<KategoriFormPage> {
   }
 
   String? _validateName(String? value) {
-    final length = (value ?? '').trim().characters.length;
-    if (length == 0) return AppStrings.namaKategoriWajib;
-    if (length < 2) return AppStrings.namaKategoriMin2;
-    if (length > 40) return AppStrings.namaKategoriMax40;
-    return null;
+    return switch (NamaKategori.validasi(value ?? '')) {
+      KesalahanNamaKategori.kosong => AppStrings.namaKategoriWajib,
+      KesalahanNamaKategori.terlaluPendek => AppStrings.namaKategoriMin2,
+      KesalahanNamaKategori.terlaluPanjang => AppStrings.namaKategoriMax40,
+      null => null,
+    };
   }
 
   @override
@@ -88,21 +91,13 @@ class _KategoriFormPageState extends State<KategoriFormPage> {
                   validator: _validateName,
                 ),
                 const SizedBox(height: AppSpacing.s16),
-                DropdownButtonFormField<JenisKategori>(
+                AppDropdownFormField<JenisKategori>(
                   initialValue: _type,
-                  decoration: const InputDecoration(
-                    labelText: AppStrings.jenis,
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: JenisKategori.pemasukan,
-                      child: Text(AppStrings.pemasukan),
-                    ),
-                    DropdownMenuItem(
-                      value: JenisKategori.pengeluaran,
-                      child: Text(AppStrings.pengeluaran),
-                    ),
-                  ],
+                  label: AppStrings.jenis,
+                  options: const {
+                    JenisKategori.pemasukan: AppStrings.pemasukan,
+                    JenisKategori.pengeluaran: AppStrings.pengeluaran,
+                  },
                   onChanged: _saving
                       ? null
                       : (type) {

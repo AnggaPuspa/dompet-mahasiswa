@@ -4,7 +4,7 @@ import 'package:dompet_mahasiswa/theme/app_spacing.dart';
 import 'package:dompet_mahasiswa/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 
-enum AppButtonVariant { primary, secondary, tinted, danger }
+enum AppButtonVariant { primary, secondary, danger }
 
 // Satu tombol untuk seluruh aplikasi. Lebar 331 dan tinggi 52
 // mengikuti frame Figma, bukan token jarak.
@@ -52,13 +52,10 @@ class AppButton extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.s8),
               ],
-              Flexible(
-                child: Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.heading19.copyWith(
-                    color: _foreground(enabled),
-                  ),
+              Text(
+                label,
+                style: AppTextStyles.heading19.copyWith(
+                  color: _foreground(enabled),
                 ),
               ),
             ],
@@ -96,7 +93,6 @@ class AppButton extends StatelessWidget {
     return switch (variant) {
       AppButtonVariant.primary => AppColors.primary,
       AppButtonVariant.secondary => AppColors.surface,
-      AppButtonVariant.tinted => AppColors.tintLilac,
       AppButtonVariant.danger => AppColors.danger,
     };
   }
@@ -108,7 +104,6 @@ class AppButton extends StatelessWidget {
     return switch (variant) {
       AppButtonVariant.primary => AppColors.onPrimary,
       AppButtonVariant.secondary => AppColors.text,
-      AppButtonVariant.tinted => AppColors.primary,
       AppButtonVariant.danger => AppColors.onPrimary,
     };
   }

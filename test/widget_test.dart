@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dompet_mahasiswa/database/database_helper.dart';
 import 'package:dompet_mahasiswa/domain/entities/dompet.dart';
 import 'package:dompet_mahasiswa/domain/entities/transaksi.dart';
-import 'package:dompet_mahasiswa/main.dart';
+import 'package:dompet_mahasiswa/pages/kategori_list_page.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,6 +33,7 @@ void main() {
 
     final dispatcher = tester.binding.platformDispatcher;
     dispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(
+      accessibleNavigation: true,
       disableAnimations: true,
     );
     addTearDown(dispatcher.clearAccessibilityFeaturesTestValue);
@@ -55,7 +56,9 @@ void main() {
       expect(finder, findsOneWidget);
     }
 
-    await tester.runAsync(() => tester.pumpWidget(const DompetMahasiswaApp()));
+    await tester.runAsync(
+      () => tester.pumpWidget(const MaterialApp(home: KategoriListPage())),
+    );
     await waitFor(find.text(AppStrings.cobaLagi));
     await tester.runAsync(() async {
       await tester.tap(find.text(AppStrings.cobaLagi));
@@ -102,9 +105,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text(AppStrings.hapus));
     });
-    await waitFor(find.text(AppStrings.mengerti));
+    await waitFor(find.text(AppStrings.kategoriTidakBisaDihapus));
     await tester.runAsync(() async {
-      await tester.tap(find.text(AppStrings.mengerti));
       await DatabaseHelper.instance.deleteTransaksi(transactionId!);
     });
     await tester.pumpAndSettle();
@@ -117,5 +119,6 @@ void main() {
     });
     await waitFor(find.text(AppStrings.belumAdaKategori));
     expect(find.text('Makanan'), findsNothing);
+    await waitFor(find.text(AppStrings.kategoriDihapus));
   });
 }

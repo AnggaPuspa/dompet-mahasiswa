@@ -16,7 +16,7 @@ void showInfoSnackbar(BuildContext context, String message) {
 
 void _showSnackbar(BuildContext context, String message, Color background) {
   ScaffoldMessenger.of(context)
-    ..removeCurrentSnackBar()
+    ..hideCurrentSnackBar()
     ..showSnackBar(
       SnackBar(
         content: Text(message, style: AppTextStyles.body),

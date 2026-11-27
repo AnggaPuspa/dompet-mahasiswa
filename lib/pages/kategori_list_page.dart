@@ -6,7 +6,7 @@ import 'package:dompet_mahasiswa/theme/app_colors.dart';
 import 'package:dompet_mahasiswa/theme/app_radius.dart';
 import 'package:dompet_mahasiswa/theme/app_spacing.dart';
 import 'package:dompet_mahasiswa/theme/app_text_styles.dart';
-import 'package:dompet_mahasiswa/theme/app_theme.dart';
+import 'package:dompet_mahasiswa/utils/app_assets.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:dompet_mahasiswa/utils/color_helper.dart';
 import 'package:dompet_mahasiswa/utils/snackbar_helper.dart';
@@ -74,11 +74,15 @@ class _KategoriListPageState extends State<KategoriListPage> {
         context,
         title: AppStrings.hapusKategoriJudul,
         message: AppStrings.konfirmasiHapusKategori(category.nama),
-        icon: const _DialogIcon('confirm', AppColors.dangerTint),
+        confirmLabel: AppStrings.hapus,
+        cancelLabel: AppStrings.batal,
+        isDanger: true,
       );
       if (!mounted || !confirmed) return;
       if (await _database.isKategoriUsedInTransaksi(id)) {
-        if (mounted) await _showBlockedDeletion();
+        if (mounted) {
+          showInfoSnackbar(context, AppStrings.kategoriTidakBisaDihapus);
+        }
         return;
       }
       try {
@@ -86,7 +90,9 @@ class _KategoriListPageState extends State<KategoriListPage> {
       } catch (_) {
         // A transaction can start using the category after the first check.
         if (!await _database.isKategoriUsedInTransaksi(id)) rethrow;
-        if (mounted) await _showBlockedDeletion();
+        if (mounted) {
+          showInfoSnackbar(context, AppStrings.kategoriTidakBisaDihapus);
+        }
         return;
       }
       if (!mounted) return;
@@ -103,43 +109,36 @@ class _KategoriListPageState extends State<KategoriListPage> {
     }
   }
 
-  Future<void> _showBlockedDeletion() async {
-    await ConfirmDialog.show(
-      context,
-      title: AppStrings.kategoriTidakBisaDihapusJudul,
-      message: AppStrings.kategoriTidakBisaDihapus,
-      confirmLabel: AppStrings.mengerti,
-      cancelLabel: null,
-      isDanger: false,
-      icon: const _DialogIcon('alert', AppColors.tintOrange),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final showEmpty = !_loading && !_loadFailed && _categories.isEmpty;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        toolbarHeight: AppTheme.tabToolbarHeight,
         title: const Text(AppStrings.kategori, style: AppTextStyles.h2),
         centerTitle: true,
-        backgroundColor: AppColors.background.withValues(alpha: 0),
+        backgroundColor: AppColors.transparent,
         actions: [
-          IconButton(
-            tooltip: AppStrings.tambah,
-            onPressed: _deleting ? null : _openForm,
-            icon: const _AddIcon(),
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.s12),
+            child: AppButton(
+              label: AppStrings.tambah,
+              icon: const Icon(Icons.add),
+              isExpanded: false,
+              onPressed: _deleting ? null : _openForm,
+            ),
           ),
         ],
       ),
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset('assets/kategori/background.png', fit: BoxFit.cover),
+          Image.asset(AppAssets.kategoriBackground, fit: BoxFit.cover),
           SafeArea(
             top: !showEmpty,
-            minimum: EdgeInsets.only(bottom: showEmpty ? AppSpacing.s32 : 0),
+            minimum: showEmpty
+                ? const EdgeInsets.only(bottom: AppSpacing.s32)
+                : EdgeInsets.zero,
             child: _buildContent(),
           ),
         ],
@@ -153,17 +152,13 @@ class _KategoriListPageState extends State<KategoriListPage> {
       return EmptyState(
         title: AppStrings.gagalMemuatKategori,
         actionLabel: AppStrings.cobaLagi,
-        onAction: () {
-          ScaffoldMessenger.of(context).removeCurrentSnackBar();
-          _load();
-        },
+        onAction: _load,
       );
     }
     if (_categories.isEmpty) {
       return EmptyState(
         title: AppStrings.belumAdaKategori,
         message: AppStrings.pesanKategoriKosong,
-        icon: const _EmptyIllustration(),
         actionLabel: AppStrings.tambahKategori,
         onAction: _openForm,
       );
@@ -176,11 +171,10 @@ class _KategoriListPageState extends State<KategoriListPage> {
               .where((category) => category.jenis == filter.value)
               .toList();
     return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.s22,
-        0,
-        AppSpacing.s22,
-        AppSpacing.s24,
+      padding: const EdgeInsets.only(
+        left: AppSpacing.s22,
+        right: AppSpacing.s22,
+        bottom: AppSpacing.s24,
       ),
       children: [
         SingleChildScrollView(
@@ -233,8 +227,8 @@ class _KategoriListPageState extends State<KategoriListPage> {
           ),
         AppButton(
           label: AppStrings.tambahKategori,
-          icon: const _AddIcon(),
-          variant: AppButtonVariant.tinted,
+          icon: const Icon(Icons.add),
+          variant: AppButtonVariant.secondary,
           onPressed: _deleting ? null : _openForm,
         ),
       ],
@@ -265,20 +259,6 @@ class _KategoriListPageState extends State<KategoriListPage> {
   };
 }
 
-class _AddIcon extends StatelessWidget {
-  const _AddIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return Image.asset(
-      'assets/kategori/add.png',
-      width: AppSpacing.s24,
-      height: AppSpacing.s24,
-      color: IconTheme.of(context).color,
-    );
-  }
-}
-
 class _CategoryRow extends StatelessWidget {
   const _CategoryRow({
     required this.category,
@@ -304,7 +284,7 @@ class _CategoryRow extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.s6),
             child: Image.asset(
-              income ? 'assets/kategori/income.png' : 'assets/kategori/tag.png',
+              income ? AppAssets.kategoriIncome : AppAssets.kategoriTag,
               width: AppSpacing.s20,
               height: AppSpacing.s20,
             ),
@@ -329,13 +309,13 @@ class _CategoryRow extends StatelessWidget {
         ),
         _CategoryAction(
           label: AppStrings.ubahKategori,
-          asset: 'edit',
+          asset: AppAssets.kategoriEdit,
           background: AppColors.tintLilac,
           onPressed: onEdit,
         ),
         _CategoryAction(
           label: AppStrings.hapus,
-          asset: 'delete',
+          asset: AppAssets.kategoriDelete,
           background: AppColors.dangerTint,
           onPressed: onDelete,
         ),
@@ -371,7 +351,7 @@ class _CategoryAction extends StatelessWidget {
         ),
         alignment: Alignment.center,
         child: Image.asset(
-          'assets/kategori/$asset.png',
+          asset,
           width: AppSpacing.s14,
           height: AppSpacing.s14,
         ),
@@ -405,83 +385,6 @@ class _Badge extends StatelessWidget {
         ),
         child: Text(label, style: AppTextStyles.label.copyWith(color: color)),
       ),
-    );
-  }
-}
-
-class _DialogIcon extends StatelessWidget {
-  const _DialogIcon(this.asset, this.background);
-
-  final String asset;
-  final Color background;
-
-  @override
-  Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: AppSpacing.s28,
-      backgroundColor: background,
-      child: Image.asset(
-        'assets/kategori/$asset.png',
-        width: AppSpacing.s24,
-        height: AppSpacing.s24,
-      ),
-    );
-  }
-}
-
-class _EmptyIllustration extends StatefulWidget {
-  const _EmptyIllustration();
-
-  @override
-  State<_EmptyIllustration> createState() => _EmptyIllustrationState();
-}
-
-class _EmptyIllustrationState extends State<_EmptyIllustration>
-    with SingleTickerProviderStateMixin {
-  late final _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 2),
-  );
-  late final _offset = TweenSequence<double>([
-    TweenSequenceItem(
-      tween: Tween(
-        begin: 0.0,
-        end: -AppSpacing.s10,
-      ).chain(CurveTween(curve: Curves.easeInOut)),
-      weight: 60,
-    ),
-    TweenSequenceItem(
-      tween: Tween(
-        begin: -AppSpacing.s10,
-        end: 0.0,
-      ).chain(CurveTween(curve: Curves.easeInOut)),
-      weight: 40,
-    ),
-  ]).animate(_controller);
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (MediaQuery.disableAnimationsOf(context)) {
-      _controller.reset();
-    } else if (!_controller.isAnimating) {
-      _controller.repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _offset,
-      child: Image.asset('assets/kategori/empty.png', width: 220, height: 176),
-      builder: (_, child) =>
-          Transform.translate(offset: Offset(0, _offset.value), child: child),
     );
   }
 }
