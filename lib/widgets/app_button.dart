@@ -74,7 +74,9 @@ class AppButton extends StatelessWidget {
         borderRadius: AppRadius.buttonAll,
         child: SizedBox(
           height: frameHeight,
-          width: isExpanded ? frameWidth : null,
+          // Mengisi ruang yang ada, paling lebar frame Figma.
+          // Dialog bisa menaruh dua tombol berdampingan.
+          width: isExpanded ? double.infinity : null,
           child: Center(child: child),
         ),
       ),
@@ -83,7 +85,13 @@ class AppButton extends StatelessWidget {
     if (!isExpanded) {
       return button;
     }
-    return Align(alignment: Alignment.center, child: button);
+    return Align(
+      alignment: Alignment.center,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: frameWidth),
+        child: button,
+      ),
+    );
   }
 
   Color _background(bool enabled) {

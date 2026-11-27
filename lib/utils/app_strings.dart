@@ -24,6 +24,7 @@ abstract final class AppStrings {
   static const String tambah = 'Tambah';
   static const String ok = 'OK';
   static const String tutup = 'Tutup';
+  static const String mengerti = 'Mengerti';
 
   static const String namaDompet = 'Nama Dompet';
   static const String hintNamaDompet = 'Contoh: Dompet Utama';
@@ -63,6 +64,8 @@ abstract final class AppStrings {
   static const String saldoTidakCukupPrefix = 'Saldo tidak cukup. Tersedia ';
   static const String dompetTidakBisaDihapus =
       'Dompet tidak bisa dihapus karena masih dipakai transaksi.';
+  static const String kategoriTidakBisaDihapusJudul =
+      'Kategori tidak bisa dihapus';
   static const String kategoriTidakBisaDihapus =
       'Kategori tidak bisa dihapus karena masih dipakai transaksi.';
   static const String hapusDompetJudul = 'Hapus Dompet?';

@@ -58,6 +58,15 @@ class _KategoriListPageState extends State<KategoriListPage> {
     }
   }
 
+  Future<void> _showTidakBisaDihapus() {
+    return ConfirmDialog.show(
+      context,
+      title: AppStrings.kategoriTidakBisaDihapusJudul,
+      message: AppStrings.kategoriTidakBisaDihapus,
+      variant: ConfirmDialogVariant.info,
+    );
+  }
+
   Future<void> _openForm([Kategori? category]) async {
     final saved = await Navigator.of(context).push<bool>(
       MaterialPageRoute(builder: (_) => KategoriFormPage(id: category?.id)),
@@ -83,9 +92,7 @@ class _KategoriListPageState extends State<KategoriListPage> {
       );
       if (!mounted || !confirmed) return;
       if (await _database.isKategoriUsedInTransaksi(id)) {
-        if (mounted) {
-          showErrorSnackbar(context, AppStrings.kategoriTidakBisaDihapus);
-        }
+        if (mounted) await _showTidakBisaDihapus();
         return;
       }
       try {
@@ -93,9 +100,7 @@ class _KategoriListPageState extends State<KategoriListPage> {
       } catch (_) {
         // A transaction can start using the category after the first check.
         if (!await _database.isKategoriUsedInTransaksi(id)) rethrow;
-        if (mounted) {
-          showErrorSnackbar(context, AppStrings.kategoriTidakBisaDihapus);
-        }
+        if (mounted) await _showTidakBisaDihapus();
         return;
       }
       if (!mounted) return;
