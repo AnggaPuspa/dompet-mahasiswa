@@ -6,6 +6,7 @@ abstract final class AppStrings {
 
   static const String dashboard = 'Dashboard';
   static const String riwayat = 'Riwayat';
+  static const String lihatRiwayat = 'Lihat Riwayat';
   static const String transaksi = 'Transaksi';
   static const String dompet = 'Dompet';
   static const String kategori = 'Kategori';
@@ -18,6 +19,7 @@ abstract final class AppStrings {
   static const String simpan = 'Simpan';
   static const String batal = 'Batal';
   static const String hapus = 'Hapus';
+  static const String ubah = 'Ubah';
   static const String cobaLagi = 'Coba Lagi';
   static const String tambah = 'Tambah';
   static const String ok = 'OK';
@@ -38,6 +40,7 @@ abstract final class AppStrings {
   static const String filterBulan = 'Filter Bulan';
   static const String filterKategori = 'Filter Kategori';
   static const String semuaBulan = 'Semua Bulan';
+  static const String semua = 'Semua';
   static const String semuaKategori = 'Semua Kategori';
   static const String pilihDompet = 'Pilih Dompet';
   static const String pilihKategori = 'Pilih Kategori';
@@ -78,16 +81,13 @@ abstract final class AppStrings {
   static const String belumAdaData = 'Belum ada data';
   static const String belumAdaDompet = 'Belum ada dompet';
   static const String belumAdaKategori = 'Belum ada kategori';
-  static const String semua = 'Semua';
-  static const String mengerti = 'Mengerti';
   static const String pesanKategoriKosong =
       'Tambah kategori pemasukan atau pengeluaran untuk mulai mencatat transaksi.';
   static const String kategoriFilterKosong =
       'Belum ada kategori untuk jenis ini';
-  static const String kategoriTidakBisaDihapusJudul =
-      'Kategori tidak bisa dihapus';
   static const String gagalMenghapusKategori = 'Gagal menghapus kategori.';
   static const String gagalMenyimpanKategori = 'Gagal menyimpan kategori.';
+  static const String kategoriTidakDitemukan = 'Kategori tidak ditemukan.';
   static String konfirmasiHapusKategori(String nama) =>
       'Kategori "$nama" akan dihapus. Lanjutkan?';
 
@@ -122,4 +122,9 @@ abstract final class AppStrings {
   static const String periodeMingguan = 'Mingguan';
   static const String periodeTahunan = 'Tahunan';
   static const String pilihPeriode = 'Pilih Periode';
+
+  /// Singkatan jumlah transaksi di kartu periode, sama dengan frame Figma ("9 trx").
+  static const String transaksiSingkat = 'trx';
+
+  static String jumlahTransaksi(int jumlah) => '$jumlah $transaksiSingkat';
 }
