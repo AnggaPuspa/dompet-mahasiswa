@@ -8,3 +8,11 @@ Color colorForJenis(String jenis) {
     JenisKategori.pengeluaran => AppColors.danger,
   };
 }
+
+/// Latar lembut untuk badge dan kartu. Pasangan dari [colorForJenis].
+Color backgroundForJenis(String jenis) {
+  return switch (JenisKategori.parse(jenis)) {
+    JenisKategori.pemasukan => AppColors.successTint,
+    JenisKategori.pengeluaran => AppColors.dangerTint,
+  };
+}
