@@ -6,6 +6,7 @@ abstract final class AppStrings {
 
   static const String dashboard = 'Dashboard';
   static const String riwayat = 'Riwayat';
+  static const String lihatRiwayat = 'Lihat Riwayat';
   static const String transaksi = 'Transaksi';
   static const String dompet = 'Dompet';
   static const String kategori = 'Kategori';
@@ -18,6 +19,7 @@ abstract final class AppStrings {
   static const String simpan = 'Simpan';
   static const String batal = 'Batal';
   static const String hapus = 'Hapus';
+  static const String ubah = 'Ubah';
   static const String cobaLagi = 'Coba Lagi';
   static const String tambah = 'Tambah';
   static const String ok = 'OK';
@@ -38,6 +40,7 @@ abstract final class AppStrings {
   static const String filterBulan = 'Filter Bulan';
   static const String filterKategori = 'Filter Kategori';
   static const String semuaBulan = 'Semua Bulan';
+  static const String semua = 'Semua';
   static const String semuaKategori = 'Semua Kategori';
   static const String pilihDompet = 'Pilih Dompet';
   static const String pilihKategori = 'Pilih Kategori';
@@ -109,4 +112,9 @@ abstract final class AppStrings {
   static const String periodeMingguan = 'Mingguan';
   static const String periodeTahunan = 'Tahunan';
   static const String pilihPeriode = 'Pilih Periode';
+
+  /// Singkatan jumlah transaksi di kartu periode, sama dengan frame Figma ("9 trx").
+  static const String transaksiSingkat = 'trx';
+
+  static String jumlahTransaksi(int jumlah) => '$jumlah $transaksiSingkat';
 }
