@@ -3,12 +3,15 @@ import 'dart:io';
 import 'package:dompet_mahasiswa/database/database_helper.dart';
 import 'package:dompet_mahasiswa/domain/entities/kategori.dart';
 import 'package:dompet_mahasiswa/pages/main_shell.dart';
+import 'package:dompet_mahasiswa/utils/app_assets.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:dompet_mahasiswa/widgets/app_button.dart';
 import 'package:dompet_mahasiswa/widgets/category_card.dart';
 import 'package:dompet_mahasiswa/widgets/empty_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lottie/lottie.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -54,6 +57,22 @@ void main() {
     expect(finder, findsOneWidget);
   }
 
+  /// Folder Lottie baru utuh setelah kertas dan badan tergambar
+  /// (sekitar 84% dari 225 frame). Frame awal hanya bentuk ungu.
+  Future<void> pumpUntilCharacterDrawn(WidgetTester tester) async {
+    for (var attempt = 0; attempt < 90; attempt++) {
+      final finder = find.byType(RawLottie);
+      if (finder.evaluate().isNotEmpty) {
+        final progress = tester.widget<RawLottie>(finder).progress;
+        if (progress >= 0.84 && progress <= 0.95) {
+          return;
+        }
+      }
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    fail('ilustrasi Lottie tidak sampai ke frame karakter');
+  }
+
   Future<void> settleAssets(WidgetTester tester) async {
     for (var attempt = 0; attempt < 8; attempt++) {
       await tester.runAsync(
@@ -94,7 +113,21 @@ void main() {
     expect(find.text(AppStrings.tambahKategori), findsOneWidget);
     expect(find.byType(CategoryCard), findsNothing);
 
-    await settleAssets(tester);
+    // Ilustrasi bawaan EmptyState, bukan gambar tag statis.
+    expect(find.byType(LottieBuilder), findsOneWidget);
+    final composition = await tester.runAsync(() async {
+      final data = await rootBundle.load(AppAssets.emptyState);
+      return LottieComposition.fromByteData(data);
+    });
+    final loaded = composition;
+    expect(loaded, isNotNull);
+    await pumpUntilCharacterDrawn(tester);
+    final rendered = tester.widget<RawLottie>(find.byType(RawLottie));
+    expect(rendered.composition?.duration, loaded!.duration);
+    expect(rendered.width, EmptyState.illustrationWidth);
+    expect(rendered.height, EmptyState.illustrationHeight);
+    expect(rendered.progress, inInclusiveRange(0.84, 0.95));
+
     await captureFinder(
       tester,
       find.byKey(const Key('proof-list')),
