@@ -65,6 +65,8 @@ abstract final class AppStrings {
   static const String hapusDompetJudul = 'Hapus Dompet?';
   static const String hapusDompetPesan =
       'Dompet ini akan dihapus permanen dari aplikasi.';
+  static String konfirmasiHapusDompet(String nama) =>
+      'Dompet "$nama" akan dihapus. Lanjutkan?';
   static const String hapusKategoriJudul = 'Hapus Kategori?';
   static const String hapusKategoriPesan =
       'Kategori ini akan dihapus permanen dari aplikasi.';
@@ -77,6 +79,8 @@ abstract final class AppStrings {
 
   static const String belumAdaData = 'Belum ada data';
   static const String belumAdaDompet = 'Belum ada dompet';
+  static const String belumAdaDompetPesan =
+      'Tambah dompet dulu, misalnya Tunai, Bank, atau E-wallet.';
   static const String belumAdaKategori = 'Belum ada kategori';
   static const String belumAdaTransaksi = 'Belum ada transaksi';
   static const String tidakAdaTransaksiFilter =
@@ -87,6 +91,9 @@ abstract final class AppStrings {
       'Tambahkan dompet dan kategori dulu untuk mencatat transaksi.';
   static const String gagalMemuatDashboard = 'Gagal memuat dashboard';
   static const String gagalMemuatDompet = 'Gagal memuat daftar dompet';
+  static const String gagalMenghapusDompet = 'Gagal menghapus dompet.';
+  static const String dompetTidakDitemukan = 'Dompet tidak ditemukan.';
+  static const String gagalMenyimpanDompet = 'Gagal menyimpan dompet.';
   static const String gagalMemuatKategori = 'Gagal memuat daftar kategori';
   static const String gagalMemuatRiwayat = 'Gagal memuat riwayat';
   static const String gagalMemuatFormTransaksi = 'Gagal memuat form transaksi';
