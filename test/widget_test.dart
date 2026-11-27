@@ -8,8 +8,6 @@ import 'package:dompet_mahasiswa/main.dart';
 import 'package:dompet_mahasiswa/pages/kategori_list_page.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:dompet_mahasiswa/widgets/app_dropdown_form_field.dart';
-// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;

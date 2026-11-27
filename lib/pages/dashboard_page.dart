@@ -14,8 +14,6 @@ import 'package:dompet_mahasiswa/widgets/empty_state.dart';
 import 'package:dompet_mahasiswa/widgets/hero_card.dart';
 import 'package:dompet_mahasiswa/widgets/icon_tile.dart';
 import 'package:dompet_mahasiswa/widgets/wallet_card.dart';
-// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// Ringkasan saldo, arus bulan ini, dan tiga kategori pengeluaran terbesar.

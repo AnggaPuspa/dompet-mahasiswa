@@ -15,8 +15,6 @@ import 'package:dompet_mahasiswa/widgets/app_filter_chip.dart';
 import 'package:dompet_mahasiswa/widgets/confirm_dialog.dart';
 import 'package:dompet_mahasiswa/widgets/empty_state.dart';
 import 'package:dompet_mahasiswa/widgets/icon_tile.dart';
-// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 class KategoriListPage extends StatefulWidget {
