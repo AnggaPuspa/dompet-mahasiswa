@@ -38,6 +38,11 @@ String formatBulanTahun(DateTime date) {
   return '${_bulanPanjang[date.month - 1]} ${date.year}';
 }
 
+// Bulan singkat plus tahun, misalnya "Nov 2026" di kartu hero.
+String formatBulanTahunPendek(DateTime date) {
+  return '${_bulanPendek[date.month - 1]} ${date.year}';
+}
+
 String toIsoDate(DateTime date) {
   final bulan = date.month.toString().padLeft(2, '0');
   final hari = date.day.toString().padLeft(2, '0');

@@ -13,6 +13,7 @@ void main() {
     final date = DateTime(2026, 11, 23);
     expect(formatTanggal(date), '23 Nov 2026');
     expect(formatBulanTahun(date), 'November 2026');
+    expect(formatBulanTahunPendek(date), 'Nov 2026');
     expect(toIsoDate(date), '2026-11-23');
     expect(toYearMonth(date), '2026-11');
     expect(parseIsoDate('2026-11-23'), date);
