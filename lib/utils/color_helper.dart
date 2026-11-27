@@ -9,6 +9,15 @@ Color colorForJenis(String jenis) {
   };
 }
 
+/// Warna teks badge jenis. Pemasukan memakai hijau yang lebih pekat
+/// daripada [colorForJenis], sesuai Badge di Figma.
+Color foregroundForJenis(String jenis) {
+  return switch (JenisKategori.parse(jenis)) {
+    JenisKategori.pemasukan => AppColors.successStrong,
+    JenisKategori.pengeluaran => AppColors.danger,
+  };
+}
+
 /// Latar lembut untuk badge dan kartu. Pasangan dari [colorForJenis].
 Color backgroundForJenis(String jenis) {
   return switch (JenisKategori.parse(jenis)) {

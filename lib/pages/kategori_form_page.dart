@@ -3,10 +3,12 @@ import 'package:dompet_mahasiswa/domain/entities/kategori.dart';
 import 'package:dompet_mahasiswa/domain/value_objects/jenis_kategori.dart';
 import 'package:dompet_mahasiswa/domain/value_objects/nama_kategori.dart';
 import 'package:dompet_mahasiswa/theme/app_spacing.dart';
+import 'package:dompet_mahasiswa/utils/app_assets.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:dompet_mahasiswa/utils/snackbar_helper.dart';
 import 'package:dompet_mahasiswa/widgets/app_button.dart';
-import 'package:dompet_mahasiswa/widgets/app_dropdown_form_field.dart';
+import 'package:dompet_mahasiswa/widgets/app_jenis_field.dart';
+import 'package:dompet_mahasiswa/widgets/app_page_header.dart';
 import 'package:dompet_mahasiswa/widgets/app_text_field.dart';
 // Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
 // ignore: deprecated_member_use
@@ -105,62 +107,81 @@ class _KategoriFormPageState extends State<KategoriFormPage> {
   }
 
   String? _validateType(JenisKategori? value) {
-    if (value == null) return AppStrings.jenisWajib;
+    if (value == null) return AppStrings.jenisKategoriWajib;
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
+    final editing = widget.id != null;
     return PopScope(
       canPop: !_saving,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            widget.id == null
-                ? AppStrings.tambahKategori
-                : AppStrings.ubahKategori,
-          ),
-        ),
-        body: _loading
-            ? const Center(child: CircularProgressIndicator())
-            : SafeArea(
-                child: Form(
-                  key: _form,
-                  child: ListView(
-                    padding: const EdgeInsets.all(AppSpacing.s22),
-                    children: [
-                      AppTextField(
-                        label: AppStrings.namaKategori,
-                        hint: AppStrings.hintNamaKategori,
-                        controller: _name,
-                        enabled: !_saving,
-                        validator: _validateName,
-                      ),
-                      const SizedBox(height: AppSpacing.s16),
-                      AppDropdownFormField<JenisKategori>(
-                        initialValue: _type,
-                        label: AppStrings.jenis,
-                        options: const {
-                          JenisKategori.pemasukan: AppStrings.pemasukan,
-                          JenisKategori.pengeluaran: AppStrings.pengeluaran,
-                        },
-                        validator: _validateType,
-                        onChanged: _saving
-                            ? null
-                            : (type) {
-                                if (type != null) setState(() => _type = type);
-                              },
-                      ),
-                      const SizedBox(height: AppSpacing.s24),
-                      AppButton(
-                        label: AppStrings.simpan,
-                        isLoading: _saving,
-                        onPressed: _save,
-                      ),
-                    ],
-                  ),
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(AppAssets.kategoriBackground, fit: BoxFit.cover),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.s22,
+                  vertical: AppSpacing.s28,
                 ),
+                child: _loading
+                    ? const Center(child: CircularProgressIndicator())
+                    : Form(
+                        key: _form,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            AppPageHeader(
+                              title: editing
+                                  ? AppStrings.ubahKategori
+                                  : AppStrings.tambahKategori,
+                              showBack: true,
+                              backEnabled: !_saving,
+                            ),
+                            const SizedBox(height: AppSpacing.s28),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    AppTextField(
+                                      label: AppStrings.namaKategori,
+                                      hint: AppStrings.hintNamaKategori,
+                                      controller: _name,
+                                      enabled: !_saving,
+                                      validator: _validateName,
+                                    ),
+                                    const SizedBox(height: AppSpacing.s24),
+                                    AppJenisField(
+                                      label: AppStrings.jenisKategori,
+                                      value: _type,
+                                      enabled: !_saving,
+                                      validator: _validateType,
+                                      onChanged: (type) {
+                                        setState(() => _type = type);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.s28),
+                            AppButton(
+                              label: AppStrings.simpan,
+                              isLoading: _saving,
+                              onPressed: _save,
+                            ),
+                          ],
+                        ),
+                      ),
               ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -74,4 +74,12 @@ class AppTextStyles {
 
   static const TextStyle h1 = heading24;
   static const TextStyle h2 = heading19;
+
+  /// Mengempiskan teks error bawaan Material supaya pesannya
+  /// bisa digambar di luar kartu field.
+  static const TextStyle hidden = TextStyle(
+    fontSize: 0,
+    height: 0,
+    color: AppColors.transparent,
+  );
 }

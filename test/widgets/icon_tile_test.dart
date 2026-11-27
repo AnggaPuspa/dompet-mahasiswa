@@ -3,6 +3,7 @@ import 'package:dompet_mahasiswa/theme/app_radius.dart';
 import 'package:dompet_mahasiswa/theme/app_spacing.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:dompet_mahasiswa/widgets/icon_tile.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/pump_app.dart';
@@ -18,7 +19,7 @@ void main() {
     final decoration = decorationOf(tester, find.byType(DecoratedBox));
     expect(decoration.color, AppColors.tintLilac);
     expect(decoration.borderRadius, AppRadius.smAll);
-    expect(find.byIcon(Icons.edit_outlined), findsOneWidget);
+    expect(find.byType(SvgPicture), findsOneWidget);
   });
 
   testWidgets('tile hapus berlatar danger', (tester) async {
@@ -28,7 +29,7 @@ void main() {
       decorationOf(tester, find.byType(DecoratedBox)).color,
       AppColors.dangerTint,
     );
-    expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+    expect(find.byType(SvgPicture), findsOneWidget);
   });
 
   testWidgets('ikon dan latar kustom menggantikan varian', (tester) async {

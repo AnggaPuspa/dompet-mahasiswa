@@ -81,7 +81,7 @@ void main() {
     await tester.tap(find.byTooltip(AppStrings.kategori));
     await tester.pump();
     await _waitFor(tester, find.text(AppStrings.belumAdaKategori));
-    expect(find.widgetWithText(AppBar, AppStrings.kategori), findsOneWidget);
+    expect(find.text(AppStrings.kategori), findsOneWidget);
     expect(_iconColor(tester, AppStrings.kategori), AppColors.primary);
 
     await tester.tap(find.byTooltip(AppStrings.dashboard));
