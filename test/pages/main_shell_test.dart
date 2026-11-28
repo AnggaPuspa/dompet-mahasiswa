@@ -4,8 +4,6 @@ import 'package:dompet_mahasiswa/database/database_helper.dart';
 import 'package:dompet_mahasiswa/main.dart';
 import 'package:dompet_mahasiswa/theme/app_colors.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
-// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;

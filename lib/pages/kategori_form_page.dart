@@ -10,8 +10,6 @@ import 'package:dompet_mahasiswa/widgets/app_button.dart';
 import 'package:dompet_mahasiswa/widgets/app_jenis_field.dart';
 import 'package:dompet_mahasiswa/widgets/app_page_header.dart';
 import 'package:dompet_mahasiswa/widgets/app_text_field.dart';
-// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 class KategoriFormPage extends StatefulWidget {
