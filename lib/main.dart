@@ -1,8 +1,6 @@
 import 'package:dompet_mahasiswa/pages/main_shell.dart';
 import 'package:dompet_mahasiswa/theme/app_theme.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
-// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 void main() {

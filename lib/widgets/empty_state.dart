@@ -19,6 +19,7 @@ class EmptyState extends StatelessWidget {
     this.actionLabel,
     this.onAction,
     this.animation,
+    this.padding = AppSpacing.pad20,
   });
 
   final String title;
@@ -30,6 +31,9 @@ class EmptyState extends StatelessWidget {
   /// Kalau diisi, pemanggil yang mengatur kemajuan ilustrasi.
   /// Kosong berarti animasi berjalan sendiri.
   final Animation<double>? animation;
+
+  /// Jarak di sekeliling isi. Nol kalau induk sudah memberi padding halaman.
+  final EdgeInsetsGeometry padding;
 
   /// Ukuran frame Figma Illustration/Empty. Bukan token jarak.
   static const double illustrationWidth = 220;
@@ -46,7 +50,7 @@ class EmptyState extends StatelessWidget {
 
     return Center(
       child: SingleChildScrollView(
-        padding: AppSpacing.pad20,
+        padding: padding,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

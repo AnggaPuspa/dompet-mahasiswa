@@ -7,8 +7,6 @@ import 'package:dompet_mahasiswa/theme/app_spacing.dart';
 import 'package:dompet_mahasiswa/theme/app_text_styles.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:dompet_mahasiswa/widgets/app_button.dart';
-// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// Urutan tab shell. Sama dengan urutan anak [IndexedStack] dan ikon bilah.

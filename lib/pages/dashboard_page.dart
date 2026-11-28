@@ -9,13 +9,12 @@ import 'package:dompet_mahasiswa/utils/currency_format.dart';
 import 'package:dompet_mahasiswa/utils/date_format.dart';
 import 'package:dompet_mahasiswa/utils/snackbar_helper.dart';
 import 'package:dompet_mahasiswa/widgets/app_badge.dart';
+import 'package:dompet_mahasiswa/widgets/app_notification_button.dart';
 import 'package:dompet_mahasiswa/widgets/app_card.dart';
 import 'package:dompet_mahasiswa/widgets/empty_state.dart';
 import 'package:dompet_mahasiswa/widgets/hero_card.dart';
 import 'package:dompet_mahasiswa/widgets/icon_tile.dart';
 import 'package:dompet_mahasiswa/widgets/wallet_card.dart';
-// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// Ringkasan saldo, arus bulan ini, dan tiga kategori pengeluaran terbesar.
@@ -366,41 +365,11 @@ class _Header extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.s12),
-        const _Bell(),
+        const AppNotificationButton(
+          color: AppColors.primary,
+          badgeColor: AppColors.accentPink,
+        ),
       ],
-    );
-  }
-}
-
-class _Bell extends StatelessWidget {
-  const _Bell();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: AppSpacing.s24,
-      height: AppSpacing.s24,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          const Icon(
-            Icons.notifications_rounded,
-            color: AppColors.primary,
-            size: AppSpacing.s24,
-          ),
-          Positioned(
-            right: 0,
-            top: 0,
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                color: AppColors.accentPink,
-                shape: BoxShape.circle,
-              ),
-              child: SizedBox(width: AppSpacing.s8, height: AppSpacing.s8),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

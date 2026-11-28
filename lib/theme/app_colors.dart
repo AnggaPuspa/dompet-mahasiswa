@@ -16,6 +16,9 @@ class AppColors {
   static const Color textMuted = Color(0xFF6E6A7C);
   static const Color textBlack = Color(0xFF000000);
 
+  /// Isi ikon Iconly Bold Arrow-Left. Bukan [text] dan bukan [textBlack].
+  static const Color icon = Color(0xFF130F26);
+
   static const Color transparent = Colors.transparent;
   static const Color background = Color(0xFFFFFFFF);
   static const Color surface = Color(0xFFFFFFFF);

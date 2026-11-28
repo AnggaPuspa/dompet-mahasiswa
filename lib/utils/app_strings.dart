@@ -13,6 +13,8 @@ abstract final class AppStrings {
   static const String tambahDompet = 'Tambah Dompet';
   static const String ubahDompet = 'Ubah Dompet';
   static const String tambahKategori = 'Tambah Kategori';
+  static const String tambahKategoriAksi = '+ Tambah Kategori';
+  static const String kembali = 'Kembali';
   static const String ubahKategori = 'Ubah Kategori';
   static const String tambahTransaksi = 'Tambah Transaksi';
   static const String ubahTransaksi = 'Ubah Transaksi';
@@ -29,8 +31,9 @@ abstract final class AppStrings {
   static const String namaDompet = 'Nama Dompet';
   static const String hintNamaDompet = 'Contoh: Dompet Utama';
   static const String namaKategori = 'Nama Kategori';
-  static const String hintNamaKategori = 'Contoh: Makanan';
+  static const String hintNamaKategori = 'Contoh: Makan & Minum';
   static const String jenis = 'Jenis';
+  static const String jenisKategori = 'Jenis Kategori';
   static const String pemasukan = 'Pemasukan';
   static const String pengeluaran = 'Pengeluaran';
   static const String jumlah = 'Jumlah';
@@ -53,6 +56,8 @@ abstract final class AppStrings {
   static const String namaKategoriMin2 = 'Nama kategori minimal 2 karakter';
   static const String namaKategoriMax40 = 'Nama kategori maksimal 40 karakter';
   static const String jenisWajib = 'Jenis wajib dipilih';
+  static const String jenisKategoriWajib =
+      'Pilih jenis kategori: Pemasukan atau Pengeluaran';
   static const String dompetWajib = 'Dompet wajib dipilih';
   static const String kategoriWajib = 'Kategori wajib dipilih';
   static const String jumlahWajib = 'Jumlah wajib diisi';
@@ -85,7 +90,7 @@ abstract final class AppStrings {
   static const String belumAdaDompet = 'Belum ada dompet';
   static const String belumAdaKategori = 'Belum ada kategori';
   static const String pesanKategoriKosong =
-      'Tambah kategori pemasukan atau pengeluaran untuk mulai mencatat transaksi.';
+      'Buat kategori Pemasukan dan Pengeluaran dulu, contohnya Uang Saku atau Makan & Minum.';
   static const String kategoriFilterKosong =
       'Belum ada kategori untuk jenis ini';
   static const String gagalMenghapusKategori = 'Gagal menghapus kategori.';

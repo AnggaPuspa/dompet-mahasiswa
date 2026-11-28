@@ -3,13 +3,9 @@ import 'dart:io';
 import 'package:dompet_mahasiswa/database/database_helper.dart';
 import 'package:dompet_mahasiswa/domain/entities/dompet.dart';
 import 'package:dompet_mahasiswa/domain/entities/transaksi.dart';
-import 'package:dompet_mahasiswa/domain/value_objects/jenis_kategori.dart';
 import 'package:dompet_mahasiswa/main.dart';
 import 'package:dompet_mahasiswa/pages/kategori_list_page.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
-import 'package:dompet_mahasiswa/widgets/app_dropdown_form_field.dart';
-// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
@@ -117,15 +113,16 @@ void main() {
 
     await tester.tap(find.text(AppStrings.tambahKategori));
     await tester.pumpAndSettle();
+    // Snackbar gagal-muat menempel di messenger root dan menutup Simpan.
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(AppStrings.simpan));
     await tester.pump();
     expect(find.text(AppStrings.namaKategoriWajib), findsOneWidget);
-    expect(find.text(AppStrings.jenisWajib), findsOneWidget);
+    expect(find.text(AppStrings.jenisKategoriWajib), findsOneWidget);
 
     await tester.enterText(find.byType(TextFormField), 'Makan');
-    await tester.tap(find.byType(AppDropdownFormField<JenisKategori>));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(AppStrings.pengeluaran).last);
+    await tester.tap(find.text(AppStrings.pengeluaran));
     await tester.pumpAndSettle();
     await tester.runAsync(() async {
       await tester.tap(find.text(AppStrings.simpan));
@@ -140,6 +137,9 @@ void main() {
       'Makan',
     );
     await tester.enterText(find.byType(TextFormField), 'Makanan');
+    // Snackbar "disimpan" masih menempel dan menutup tombol bawah.
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
     await tester.runAsync(() async {
       await tester.tap(find.text(AppStrings.simpan));
     });

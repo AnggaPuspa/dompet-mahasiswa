@@ -2,7 +2,6 @@ import 'package:dompet_mahasiswa/database/database_helper.dart';
 import 'package:dompet_mahasiswa/domain/entities/kategori.dart';
 import 'package:dompet_mahasiswa/domain/value_objects/jenis_kategori.dart';
 import 'package:dompet_mahasiswa/pages/kategori_form_page.dart';
-import 'package:dompet_mahasiswa/theme/app_colors.dart';
 import 'package:dompet_mahasiswa/theme/app_spacing.dart';
 import 'package:dompet_mahasiswa/theme/app_text_styles.dart';
 import 'package:dompet_mahasiswa/utils/app_assets.dart';
@@ -10,13 +9,11 @@ import 'package:dompet_mahasiswa/utils/app_strings.dart';
 import 'package:dompet_mahasiswa/utils/snackbar_helper.dart';
 import 'package:dompet_mahasiswa/widgets/app_badge.dart';
 import 'package:dompet_mahasiswa/widgets/app_button.dart';
-import 'package:dompet_mahasiswa/widgets/app_card.dart';
 import 'package:dompet_mahasiswa/widgets/app_filter_chip.dart';
+import 'package:dompet_mahasiswa/widgets/app_page_header.dart';
+import 'package:dompet_mahasiswa/widgets/category_card.dart';
 import 'package:dompet_mahasiswa/widgets/confirm_dialog.dart';
 import 'package:dompet_mahasiswa/widgets/empty_state.dart';
-import 'package:dompet_mahasiswa/widgets/icon_tile.dart';
-// Paket pengganti material_ui belum ada di SDK ini. development punya info yang sama.
-// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 class KategoriListPage extends StatefulWidget {
@@ -119,35 +116,27 @@ class _KategoriListPageState extends State<KategoriListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final showEmpty = !_loading && !_loadFailed && _categories.isEmpty;
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text(AppStrings.kategori, style: AppTextStyles.h2),
-        centerTitle: true,
-        backgroundColor: AppColors.transparent,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.s12),
-            child: AppButton(
-              label: AppStrings.tambah,
-              icon: const Icon(Icons.add),
-              isExpanded: false,
-              onPressed: _deleting ? null : _openForm,
-            ),
-          ),
-        ],
-      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
           Image.asset(AppAssets.kategoriBackground, fit: BoxFit.cover),
           SafeArea(
-            top: !showEmpty,
-            minimum: showEmpty
-                ? const EdgeInsets.only(bottom: AppSpacing.s32)
-                : EdgeInsets.zero,
-            child: _buildContent(),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.s22,
+                AppSpacing.s28,
+                AppSpacing.s22,
+                AppSpacing.s28,
+              ),
+              child: Column(
+                children: [
+                  const AppPageHeader(title: AppStrings.kategori),
+                  const SizedBox(height: AppSpacing.s24),
+                  Expanded(child: _buildContent()),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -158,6 +147,7 @@ class _KategoriListPageState extends State<KategoriListPage> {
     if (_loading) return const Center(child: CircularProgressIndicator());
     if (_loadFailed) {
       return EmptyState(
+        padding: EdgeInsets.zero,
         title: AppStrings.gagalMemuatKategori,
         actionLabel: AppStrings.cobaLagi,
         onAction: _load,
@@ -165,6 +155,7 @@ class _KategoriListPageState extends State<KategoriListPage> {
     }
     if (_categories.isEmpty) {
       return EmptyState(
+        padding: EdgeInsets.zero,
         title: AppStrings.belumAdaKategori,
         message: AppStrings.pesanKategoriKosong,
         actionLabel: AppStrings.tambahKategori,
@@ -179,11 +170,7 @@ class _KategoriListPageState extends State<KategoriListPage> {
               .where((category) => category.jenis == filter.value)
               .toList();
     return ListView(
-      padding: const EdgeInsets.only(
-        left: AppSpacing.s22,
-        right: AppSpacing.s22,
-        bottom: AppSpacing.s24,
-      ),
+      padding: EdgeInsets.zero,
       children: [
         AppFilterChipBar<JenisKategori?>(
           selected: filter,
@@ -202,16 +189,12 @@ class _KategoriListPageState extends State<KategoriListPage> {
             ),
           ],
         ),
-        const SizedBox(height: AppSpacing.s20),
+        const SizedBox(height: AppSpacing.s24),
         Row(
           children: [
-            Text(_label(filter), style: AppTextStyles.h2),
-            const SizedBox(width: AppSpacing.s8),
-            AppBadge(
-              label: '${visible.length}',
-              foreground: AppColors.primary,
-              background: AppColors.tintLilac,
-            ),
+            Text(_label(filter), style: AppTextStyles.heading19),
+            const SizedBox(width: AppSpacing.s6),
+            AppCountBadge(count: visible.length),
           ],
         ),
         const SizedBox(height: AppSpacing.s16),
@@ -224,25 +207,20 @@ class _KategoriListPageState extends State<KategoriListPage> {
             ),
           ),
         for (final category in visible)
-          AppCard(
+          CategoryCard(
             key: ValueKey(category.id),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.s16,
-              vertical: AppSpacing.s10,
-            ),
+            name: category.nama,
+            jenis: category.jenis,
+            style: CategoryCardStyle.forCategory(category.nama, category.jenis),
             margin: const EdgeInsets.only(bottom: AppSpacing.s16),
             onTap: _deleting ? null : () => _openForm(category),
-            child: _CategoryRow(
-              category: category,
-              onEdit: _deleting ? null : () => _openForm(category),
-              onDelete: _deleting ? null : () => _delete(category),
-            ),
+            onEdit: _deleting ? null : () => _openForm(category),
+            onDelete: _deleting ? null : () => _delete(category),
           ),
         AppButton(
-          label: AppStrings.tambahKategori,
-          icon: const Icon(Icons.add),
+          label: AppStrings.tambahKategoriAksi,
           variant: AppButtonVariant.secondary,
-          onPressed: _deleting ? null : _openForm,
+          onPressed: _deleting ? null : () => _openForm(),
         ),
       ],
     );
@@ -253,50 +231,4 @@ class _KategoriListPageState extends State<KategoriListPage> {
     JenisKategori.pemasukan => AppStrings.pemasukan,
     JenisKategori.pengeluaran => AppStrings.pengeluaran,
   };
-}
-
-class _CategoryRow extends StatelessWidget {
-  const _CategoryRow({
-    required this.category,
-    required this.onEdit,
-    required this.onDelete,
-  });
-
-  final Kategori category;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
-
-  @override
-  Widget build(BuildContext context) {
-    final income = category.jenis == JenisKategori.pemasukan.value;
-    return Row(
-      children: [
-        IconTile(
-          icon: Image.asset(
-            income ? AppAssets.kategoriIncome : AppAssets.kategoriTag,
-            width: IconTile.glyphExtent,
-            height: IconTile.glyphExtent,
-          ),
-          background: income ? AppColors.successTint : AppColors.tintSky,
-          foreground: income ? AppColors.success : AppColors.accentBlue,
-        ),
-        const SizedBox(width: AppSpacing.s12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(category.nama, style: AppTextStyles.body),
-              const SizedBox(height: AppSpacing.s4),
-              AppBadge(
-                label: income ? AppStrings.pemasukan : AppStrings.pengeluaran,
-                jenis: category.jenis,
-              ),
-            ],
-          ),
-        ),
-        AppIconButton(variant: IconTileVariant.edit, onPressed: onEdit),
-        AppIconButton(variant: IconTileVariant.delete, onPressed: onDelete),
-      ],
-    );
-  }
 }

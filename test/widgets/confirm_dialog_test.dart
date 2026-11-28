@@ -128,7 +128,9 @@ Color? _badgeColor(WidgetTester tester) {
   )) {
     final decoration = box.decoration;
     if (decoration is BoxDecoration &&
-        decoration.borderRadius == AppRadius.fullAll) {
+        decoration.borderRadius == AppRadius.fullAll &&
+        decoration.color != null &&
+        decoration.color != AppColors.primary) {
       return decoration.color;
     }
   }
