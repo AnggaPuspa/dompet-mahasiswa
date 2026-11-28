@@ -107,6 +107,7 @@ class ShellNavigationBar extends StatelessWidget {
                   child: Row(
                     children: [
                       _NavButton(
+                        semanticsId: 'nav_dashboard',
                         label: AppStrings.dashboard,
                         selected: selectedIndex == _tabDashboard,
                         icon: Icons.home_outlined,
@@ -114,6 +115,7 @@ class ShellNavigationBar extends StatelessWidget {
                         onPressed: () => onSelected(_tabDashboard),
                       ),
                       _NavButton(
+                        semanticsId: 'nav_dompet',
                         label: AppStrings.dompet,
                         selected: selectedIndex == _tabDompet,
                         icon: Icons.account_balance_wallet_outlined,
@@ -122,6 +124,7 @@ class ShellNavigationBar extends StatelessWidget {
                       ),
                       const SizedBox(width: fabExtent),
                       _NavButton(
+                        semanticsId: 'nav_riwayat',
                         label: AppStrings.riwayat,
                         selected: selectedIndex == _tabRiwayat,
                         icon: Icons.receipt_long_outlined,
@@ -129,6 +132,7 @@ class ShellNavigationBar extends StatelessWidget {
                         onPressed: () => onSelected(_tabRiwayat),
                       ),
                       _NavButton(
+                        semanticsId: 'nav_kategori',
                         label: AppStrings.kategori,
                         selected: selectedIndex == _tabKategori,
                         icon: Icons.grid_view_outlined,
@@ -142,6 +146,7 @@ class ShellNavigationBar extends StatelessWidget {
               Positioned(
                 top: 0,
                 child: _AddButton(
+                  semanticsId: 'nav_transaksi',
                   selected: selectedIndex == _tabTransaksi,
                   onPressed: () => onSelected(_tabTransaksi),
                 ),
@@ -156,6 +161,7 @@ class ShellNavigationBar extends StatelessWidget {
 
 class _NavButton extends StatelessWidget {
   const _NavButton({
+    required this.semanticsId,
     required this.label,
     required this.selected,
     required this.icon,
@@ -163,6 +169,8 @@ class _NavButton extends StatelessWidget {
     required this.onPressed,
   });
 
+  /// Identifier semantik untuk alat uji di luar Flutter. Tidak tampil di layar.
+  final String semanticsId;
   final String label;
   final bool selected;
   final IconData icon;
@@ -173,43 +181,54 @@ class _NavButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = selected ? AppColors.primary : AppColors.primarySoft;
     return Expanded(
-      child: IconButton(
-        tooltip: label,
-        onPressed: onPressed,
-        icon: Icon(selected ? selectedIcon : icon, color: color),
+      child: Semantics(
+        identifier: semanticsId,
+        child: IconButton(
+          tooltip: label,
+          onPressed: onPressed,
+          icon: Icon(selected ? selectedIcon : icon, color: color),
+        ),
       ),
     );
   }
 }
 
 class _AddButton extends StatelessWidget {
-  const _AddButton({required this.selected, required this.onPressed});
+  const _AddButton({
+    required this.semanticsId,
+    required this.selected,
+    required this.onPressed,
+  });
 
+  final String semanticsId;
   final bool selected;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: AppStrings.transaksi,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: selected ? AppShadows.primary : AppShadows.hero,
-        ),
-        child: Material(
-          color: AppColors.primary,
-          shape: const CircleBorder(),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: onPressed,
-            child: SizedBox(
-              width: ShellNavigationBar.fabExtent,
-              height: ShellNavigationBar.fabExtent,
-              child: Icon(
-                Icons.add,
-                color: AppColors.onPrimary,
-                size: AppSpacing.s28,
+    return Semantics(
+      identifier: semanticsId,
+      child: Tooltip(
+        message: AppStrings.transaksi,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: selected ? AppShadows.primary : AppShadows.hero,
+          ),
+          child: Material(
+            color: AppColors.primary,
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: onPressed,
+              child: SizedBox(
+                width: ShellNavigationBar.fabExtent,
+                height: ShellNavigationBar.fabExtent,
+                child: Icon(
+                  Icons.add,
+                  color: AppColors.onPrimary,
+                  size: AppSpacing.s28,
+                ),
               ),
             ),
           ),

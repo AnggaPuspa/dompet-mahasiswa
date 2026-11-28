@@ -15,9 +15,14 @@ flutter test
 flutter test test/<file>_test.dart
 dart format .
 flutter run
+maestro check-syntax .maestro/smoke.yaml .maestro/kategori_tambah.yaml .maestro/kategori_validasi.yaml .maestro/kategori_hapus.yaml .maestro/subflows/buka_kategori.yaml .maestro/subflows/simpan_kategori.yaml
+maestro test .maestro/
+maestro test .maestro/smoke.yaml
 ```
 
 Analisis dan tes selalu lewat Flutter. Jangan pakai `dart analyze` atau `dart test`. Satu berkas: ganti pola di atas, misalnya `flutter test test/database_helper_test.dart`. `flutter analyze` harus bersih (0 issue) sebelum push.
+
+Tes UI end-to-end ada di `.maestro/`. Pasang CLI, bangun aplikasi, dan artinya tiap flow ada di `.maestro/README.md`. Satu flow: ganti path, misalnya `maestro test .maestro/kategori_hapus.yaml`. Sekelompok flow lewat tag: `maestro test .maestro/ --include-tags=kategori`.
 
 ## Peta layer
 

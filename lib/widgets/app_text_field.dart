@@ -15,6 +15,7 @@ class AppTextField extends StatefulWidget {
   const AppTextField({
     super.key,
     required this.label,
+    this.identifier,
     this.controller,
     this.initialValue,
     this.hint,
@@ -31,6 +32,9 @@ class AppTextField extends StatefulWidget {
   });
 
   final String label;
+
+  /// Identifier semantik untuk alat uji di luar Flutter. Tidak tampil di layar.
+  final String? identifier;
   final TextEditingController? controller;
   final String? initialValue;
   final String? hint;
@@ -134,7 +138,7 @@ class _AppTextFieldState extends State<AppTextField> {
   }
 
   Widget _field() {
-    return TextFormField(
+    final field = TextFormField(
       key: _fieldKey,
       controller: widget.controller,
       initialValue: widget.controller == null ? widget.initialValue : null,
@@ -173,5 +177,10 @@ class _AppTextFieldState extends State<AppTextField> {
         color: widget.enabled ? AppColors.text : AppColors.textMuted,
       ),
     );
+    final identifier = widget.identifier;
+    if (identifier == null) {
+      return field;
+    }
+    return Semantics(identifier: identifier, child: field);
   }
 }

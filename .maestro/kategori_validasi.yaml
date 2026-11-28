@@ -1,0 +1,11 @@
+appId: com.dompetmahasiswa.dompet_mahasiswa
+name: Validasi nama kategori kosong
+tags:
+  - kategori
+---
+- runFlow: subflows/buka_kategori.yaml
+- tapOn: Tambah Kategori
+- assertVisible: Nama Kategori
+- tapOn: Simpan
+- assertVisible: Nama kategori wajib diisi
+- assertVisible: Tambah Kategori

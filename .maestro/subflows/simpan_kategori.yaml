@@ -1,0 +1,17 @@
+appId: com.dompetmahasiswa.dompet_mahasiswa
+tags:
+  - util
+---
+# Daftar masih kosong, jadi tombolnya "Tambah Kategori".
+- tapOn: Tambah Kategori
+- assertVisible: Nama Kategori
+- tapOn: Pemasukan
+- tapOn:
+    id: kategori_nama
+- inputText:
+    text: ${NAMA}
+    label: Nama kategori
+- hideKeyboard
+- tapOn: Simpan
+# Kartu menggabungkan nama dan jenis jadi satu label, misalnya "Uang Saku\nPemasukan".
+- assertVisible: "${NAMA}.*"

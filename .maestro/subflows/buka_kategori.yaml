@@ -1,0 +1,10 @@
+appId: com.dompetmahasiswa.dompet_mahasiswa
+tags:
+  - util
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: nav_kategori
+- assertVisible: Belum ada kategori
+- assertVisible: Kategori

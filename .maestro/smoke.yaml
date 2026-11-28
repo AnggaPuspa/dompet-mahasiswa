@@ -1,0 +1,18 @@
+appId: com.dompetmahasiswa.dompet_mahasiswa
+name: Smoke
+tags:
+  - smoke
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: nav_dashboard
+- assertVisible:
+    id: nav_dompet
+- assertVisible:
+    id: nav_transaksi
+- assertVisible:
+    id: nav_riwayat
+- assertVisible:
+    id: nav_kategori
+- assertVisible: Belum ada data
