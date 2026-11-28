@@ -22,6 +22,16 @@ maestro test .maestro/smoke.yaml
 
 Analisis dan tes selalu lewat Flutter. Jangan pakai `dart analyze` atau `dart test`. Satu berkas: ganti pola di atas, misalnya `flutter test test/database_helper_test.dart`. `flutter analyze` harus bersih (0 issue) sebelum push.
 
+Check yang sama dengan CI, dari root repo:
+
+```bash
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze
+flutter test
+```
+
+Workflow `.github/workflows/ci.yml` menjalankan ketiga perintah itu pada pull request ke `development`/`main` dan pada push ke kedua branch. CI memakai Flutter stable 3.47.9 (Dart 3.13.7, masuk `environment.sdk: ^3.12.0` dan syarat `lottie`) dan wajib hijau sebelum merge. Flow di `.maestro/` tidak ikut dijalankan.
+
 Tes UI end-to-end ada di `.maestro/`. Pasang CLI, bangun aplikasi, dan artinya tiap flow ada di `.maestro/README.md`. Satu flow: ganti path, misalnya `maestro test .maestro/kategori_hapus.yaml`. Sekelompok flow lewat tag: `maestro test .maestro/ --include-tags=kategori`.
 
 ## Peta layer
@@ -135,6 +145,8 @@ git checkout -b feat/<nomor-issue>-<slug>
 Buka PR ke `development`. Jangan membuka PR ke `main`. Body PR memuat baris `Closes #N` (nomor issue yang diselesaikan).
 
 Pesan commit conventional, satu jenis: `feat`, `fix`, `chore`, `refactor`, `test`, atau `docs`. Contoh: `feat: samakan daftar kategori dengan Figma`.
+
+CI (`.github/workflows/ci.yml`) berjalan pada pull request ke `development` dan `main`, serta pada push ke kedua branch itu. Judul PR wajib conventional commit: `type(scope opsional): deskripsi`, dengan type `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `style`, `perf`, `ci`, atau `build`. Check format, analisis, dan tes wajib hijau sebelum merge. Perintah lokalnya ada di seksi Perintah.
 
 Rilis `development` ke `main` kita lakukan lewat PR rilis terpisah. Jangan membuat PR ke `main`, dan jangan merge PR ke `main`.
 
