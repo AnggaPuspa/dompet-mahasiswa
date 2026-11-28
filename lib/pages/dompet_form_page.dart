@@ -1,5 +1,6 @@
 import 'package:dompet_mahasiswa/theme/app_spacing.dart';
 import 'package:dompet_mahasiswa/utils/app_strings.dart';
+import 'package:dompet_mahasiswa/widgets/app_back_button.dart';
 import 'package:dompet_mahasiswa/widgets/app_button.dart';
 import 'package:dompet_mahasiswa/widgets/app_text_field.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _DompetFormPageState extends State<DompetFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: const AppBackButton(),
         title: Text(
           widget.id == null ? AppStrings.tambahDompet : AppStrings.ubahDompet,
         ),

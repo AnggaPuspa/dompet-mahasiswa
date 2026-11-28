@@ -1,3 +1,4 @@
+import 'package:dompet_mahasiswa/theme/app_colors.dart';
 import 'package:dompet_mahasiswa/theme/app_radius.dart';
 import 'package:dompet_mahasiswa/theme/app_spacing.dart';
 import 'package:dompet_mahasiswa/theme/app_text_styles.dart';
@@ -34,16 +35,17 @@ class AppBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: _background,
-        borderRadius: AppRadius.smAll,
-      ),
-      child: SizedBox(
-        height: frameHeight,
+    return SizedBox(
+      height: frameHeight,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: _background,
+          borderRadius: AppRadius.smAll,
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s6),
           child: Center(
+            widthFactor: 1,
             child: Text(
               label,
               style: AppTextStyles.label.copyWith(color: _foreground),
@@ -54,7 +56,36 @@ class AppBadge extends StatelessWidget {
     );
   }
 
-  Color get _foreground => foreground ?? colorForJenis(jenis!);
+  Color get _foreground => foreground ?? foregroundForJenis(jenis!);
 
   Color get _background => background ?? backgroundForJenis(jenis!);
+}
+
+/// Angka bulat 16 di samping judul bagian, misalnya jumlah kategori.
+class AppCountBadge extends StatelessWidget {
+  const AppCountBadge({super.key, required this.count});
+
+  final int count;
+
+  static const double extent = AppSpacing.s16;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: AppColors.primaryTint,
+        borderRadius: AppRadius.fullAll,
+      ),
+      child: SizedBox(
+        width: extent,
+        height: extent,
+        child: Center(
+          child: Text(
+            '$count',
+            style: AppTextStyles.caption.copyWith(color: AppColors.primary),
+          ),
+        ),
+      ),
+    );
+  }
 }

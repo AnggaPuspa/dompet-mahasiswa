@@ -24,10 +24,17 @@ Future<void> loadProofFonts() async {
   }
   await text.load();
 
-  const iconsPath =
-      '/tmp/flutter-sdk/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf';
-  final icons = File(iconsPath);
-  if (icons.existsSync()) {
+  final home = Platform.environment['HOME'];
+  final icons = [
+    File(
+      '/tmp/flutter-sdk/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
+    ),
+    if (home != null)
+      File(
+        '$home/flutter-sdk/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
+      ),
+  ].where((file) => file.existsSync()).firstOrNull;
+  if (icons != null) {
     final iconFont = FontLoader('MaterialIcons');
     iconFont.addFont(
       Future<ByteData>.value(ByteData.sublistView(icons.readAsBytesSync())),
