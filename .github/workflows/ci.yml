@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+    branches: [development, main]
+  push:
+    branches: [development, main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  pr-rules:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Validasi judul PR
+        uses: amannn/action-semantic-pull-request@v6.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            chore
+            docs
+            test
+            refactor
+            style
+            perf
+            ci
+            build
+          requireScope: false
+
+  flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2.23.0
+        with:
+          channel: stable
+          # 3.47.9 stable membawa Dart 3.13.7: masuk sdk ^3.12.0 dan lottie ^3.8.2.
+          # Flutter 3.50 menandai package:flutter/material.dart deprecated.
+          # AGENTS.md melarang migrasi ke material_ui dan ignore baru.
+          flutter-version: "3.47.9"
+          cache: true
+
+      - name: Ambil dependensi
+        run: flutter pub get
+
+      - name: Cek format
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analisis
+        run: flutter analyze
+
+      - name: Tes
+        run: flutter test
