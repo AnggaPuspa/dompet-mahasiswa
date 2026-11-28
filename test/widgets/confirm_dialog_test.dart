@@ -46,6 +46,7 @@ void main() {
     );
     expect(hapus.variant, AppButtonVariant.danger);
     expect(batal.variant, AppButtonVariant.secondary);
+    expect(find.bySemanticsIdentifier('konfirmasi_dialog'), findsOneWidget);
     expect(_badgeColor(tester), AppColors.dangerTint);
 
     await tester.tap(find.text(AppStrings.batal));

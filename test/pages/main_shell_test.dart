@@ -43,6 +43,11 @@ void main() {
     await tester.runAsync(() => tester.pumpWidget(const DompetMahasiswaApp()));
     await _waitFor(tester, find.text(AppStrings.belumAdaData));
 
+    expect(find.bySemanticsIdentifier('nav_dashboard'), findsOneWidget);
+    expect(find.bySemanticsIdentifier('nav_dompet'), findsOneWidget);
+    expect(find.bySemanticsIdentifier('nav_transaksi'), findsOneWidget);
+    expect(find.bySemanticsIdentifier('nav_riwayat'), findsOneWidget);
+    expect(find.bySemanticsIdentifier('nav_kategori'), findsOneWidget);
     expect(_iconColor(tester, AppStrings.dashboard), AppColors.primary);
     expect(_iconColor(tester, AppStrings.dompet), AppColors.primarySoft);
 

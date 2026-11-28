@@ -147,6 +147,7 @@ class _KategoriFormPageState extends State<KategoriFormPage> {
                                       CrossAxisAlignment.stretch,
                                   children: [
                                     AppTextField(
+                                      identifier: 'kategori_nama',
                                       label: AppStrings.namaKategori,
                                       hint: AppStrings.hintNamaKategori,
                                       controller: _name,

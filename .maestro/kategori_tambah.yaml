@@ -1,0 +1,13 @@
+appId: com.dompetmahasiswa.dompet_mahasiswa
+name: Tambah kategori
+tags:
+  - kategori
+---
+- runFlow: subflows/buka_kategori.yaml
+- runFlow:
+    file: subflows/simpan_kategori.yaml
+    env:
+      NAMA: Uang Saku
+- assertVisible: "Uang Saku.*"
+- assertVisible: "Semua Kategori.*"
+- assertVisible: Pemasukan

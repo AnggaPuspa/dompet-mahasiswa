@@ -125,7 +125,13 @@ class CategoryCard extends StatelessWidget {
           ),
           AppIconButton(variant: IconTileVariant.edit, onPressed: onEdit),
           const SizedBox(width: AppSpacing.s8),
-          AppIconButton(variant: IconTileVariant.delete, onPressed: onDelete),
+          Semantics(
+            identifier: 'kategori_hapus',
+            child: AppIconButton(
+              variant: IconTileVariant.delete,
+              onPressed: onDelete,
+            ),
+          ),
         ],
       ),
     );

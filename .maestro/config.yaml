@@ -1,0 +1,6 @@
+# Hanya flow di akar workspace yang dijalankan sebagai tes.
+# Subflow di subflows/ dipakai lewat runFlow dan bertag util.
+flows:
+  - "*"
+excludeTags:
+  - util

@@ -1,0 +1,20 @@
+appId: com.dompetmahasiswa.dompet_mahasiswa
+name: Hapus kategori
+tags:
+  - kategori
+---
+- runFlow: subflows/buka_kategori.yaml
+- runFlow:
+    file: subflows/simpan_kategori.yaml
+    env:
+      NAMA: Uang Saku
+- tapOn:
+    id: kategori_hapus
+- assertVisible:
+    id: konfirmasi_dialog
+# Dialog menggabungkan judul, pesan, dan Batal dalam satu label.
+- assertVisible: "Hapus Kategori\\?.*Uang Saku.*Lanjutkan\\?.*"
+- tapOn:
+    id: konfirmasi_dialog
+- assertVisible: Belum ada kategori
+- assertNotVisible: "Uang Saku.*"

@@ -112,6 +112,7 @@ void main() {
     expect(find.byType(EmptyState), findsWidgets);
     expect(find.text(AppStrings.tambahKategori), findsOneWidget);
     expect(find.byType(CategoryCard), findsNothing);
+    expect(find.bySemanticsIdentifier('kategori_hapus'), findsNothing);
 
     // Ilustrasi bawaan EmptyState, bukan gambar tag statis.
     expect(find.byType(LottieBuilder), findsOneWidget);
@@ -160,6 +161,10 @@ void main() {
     await waitFor(tester, find.text('Uang Saku'));
 
     expect(find.byType(CategoryCard), findsNWidgets(rows.length));
+    expect(
+      find.bySemanticsIdentifier('kategori_hapus'),
+      findsNWidgets(rows.length),
+    );
     expect(find.text(AppStrings.semuaKategori), findsOneWidget);
     expect(find.text('${rows.length}'), findsOneWidget);
     expect(find.text(AppStrings.tambahKategoriAksi), findsOneWidget);

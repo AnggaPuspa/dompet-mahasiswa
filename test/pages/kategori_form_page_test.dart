@@ -89,6 +89,7 @@ void main() {
     await pumpForm(tester);
 
     expect(find.text(AppStrings.tambahKategori), findsOneWidget);
+    expect(find.bySemanticsIdentifier('kategori_nama'), findsOneWidget);
     expect(find.text(AppStrings.jenisKategori), findsOneWidget);
     expect(find.text(AppStrings.pemasukan), findsOneWidget);
     expect(find.text(AppStrings.pengeluaran), findsOneWidget);

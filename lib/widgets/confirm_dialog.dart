@@ -113,12 +113,15 @@ class _ConfirmDialogBody extends StatelessWidget {
   }
 
   Widget _actions(BuildContext context) {
-    final confirm = AppButton(
-      label: confirmLabel,
-      variant: variant == ConfirmDialogVariant.danger
-          ? AppButtonVariant.danger
-          : AppButtonVariant.primary,
-      onPressed: () => Navigator.pop(context, true),
+    final confirm = Semantics(
+      identifier: 'konfirmasi_dialog',
+      child: AppButton(
+        label: confirmLabel,
+        variant: variant == ConfirmDialogVariant.danger
+            ? AppButtonVariant.danger
+            : AppButtonVariant.primary,
+        onPressed: () => Navigator.pop(context, true),
+      ),
     );
     if (variant == ConfirmDialogVariant.info) {
       return confirm;
